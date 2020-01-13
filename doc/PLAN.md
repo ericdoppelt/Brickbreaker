@@ -1,5 +1,5 @@
 # Game Plan
-## NAME
+## Eric Doppelt
 
 
 ### Breakout Variant
