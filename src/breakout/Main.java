@@ -105,6 +105,8 @@ public class Main extends Application {
         }
         else if (code == KeyCode.W) {
             myPaddle.toggleWrapAround();
+        } else if (code == KeyCode.R) {
+            myPaddle.placeCenter(SIZE_X);
         }
     }
 }

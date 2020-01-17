@@ -29,6 +29,15 @@ public class Paddle {
         myRectangle.setX(width - myRectangle.getWidth());
     }
 
+    public void placeLeft() {
+        myRectangle.setX(0);
+        System.out.println("Left");
+    }
+
+    public void placeCenter(int width) {
+        myRectangle.setX((width - myRectangle.getWidth()) / 2);
+    }
+
     public void handleRight(int width) {
         if (wrapAround) {
             if (myRectangle.getX() > width) placeLeft();
@@ -48,11 +57,6 @@ public class Paddle {
     public boolean offLeft() {
         if (myRectangle.getX() < 0) return true;
         return false;
-    }
-
-    public void placeLeft() {
-        myRectangle.setX(0);
-        System.out.println("Left");
     }
 }
 
