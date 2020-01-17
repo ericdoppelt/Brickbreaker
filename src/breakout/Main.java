@@ -97,9 +97,14 @@ public class Main extends Application {
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
             myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + MOVER_SPEED);
+            if (myPaddle.offRight(SIZE_X)) myPaddle.handleRight(SIZE_X);
         }
         else if (code == KeyCode.LEFT) {
             myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - MOVER_SPEED);
+            if (myPaddle.offLeft()) myPaddle.handleLeft(SIZE_X);
+        }
+        else if (code == KeyCode.W) {
+            myPaddle.toggleWrapAround();
         }
     }
 }
