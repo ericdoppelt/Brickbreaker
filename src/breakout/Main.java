@@ -24,15 +24,15 @@ public class Main extends Application {
     public static final int PADDLE_WIDTH = 100;
     public static final int PADDLE_HEIGHT = 20;
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 500;
-    public static final int BOUNCER_SPEED_Y = 600;
+    public static final int BOUNCER_SPEED_X = 100;
+    public static final int BOUNCER_SPEED_Y = -200;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-    private static final int MOVER_SPEED = 20;
+    private static final int MOVER_SPEED = 40;
 
     private Scene myScene;
     private Scene mySplashScreen;
@@ -67,10 +67,10 @@ public class Main extends Application {
     private void step(double elapsedTime) {
 
         for (Bouncer tempBouncer : allBouncers) {
-            if (!tempBouncer.xOnScreen()) tempBouncer.reverseXDirection();
+            if (!tempBouncer.HitWall()) tempBouncer.reverseXDirection();
+            if (!tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
+            if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
-            System.out.println((tempBouncer.getXChange()));
-            if (!tempBouncer.yOnScreen()) tempBouncer.reverseYDirection();
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
 
         }
@@ -84,7 +84,7 @@ public class Main extends Application {
         myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
         root.getChildren().add(myBouncer.getCircle());
-        root.getChildren().add(myPaddle.getPaddle());
+        root.getChildren().add(myPaddle.getRectangle());
 
         Scene scene = new Scene(root, width, height, background);
 
@@ -96,10 +96,10 @@ public class Main extends Application {
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            myPaddle.getPaddle().setX(myPaddle.getPaddle().getX() + MOVER_SPEED);
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + MOVER_SPEED);
         }
         else if (code == KeyCode.LEFT) {
-            myPaddle.getPaddle().setX(myPaddle.getPaddle().getX() - MOVER_SPEED);
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - MOVER_SPEED);
         }
     }
 }

@@ -12,7 +12,7 @@ public class Paddle {
         myPaddle.setFill(fill);
     }
 
-    public Rectangle getPaddle() {
+    public Rectangle getRectangle() {
         return myPaddle;
     }
 

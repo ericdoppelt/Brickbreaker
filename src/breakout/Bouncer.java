@@ -40,14 +40,24 @@ public class Bouncer {
         myCircle.setCenterY(y);
     }
 
-    public boolean xOnScreen() {
+    public boolean HitWall() {
         if (myCircle.getCenterX() + myCircle.getRadius() >= Main.SIZE_X || myCircle.getCenterX() - myCircle.getRadius() <= 0) return false;
         return true;
     }
 
-    public boolean yOnScreen() {
-        if (myCircle.getCenterY() + myCircle.getRadius() >= Main.SIZE_Y || myCircle.getCenterY() - myCircle.getRadius() <= 0) return false;
+    public boolean HitCeiling() {
+        if (myCircle.getCenterY() - myCircle.getRadius() <= 0) return false;
         return true;
+    }
+
+    public boolean HitPaddle(Paddle paddle) {
+        if (myCircle.intersects(paddle.getRectangle().getBoundsInLocal())) return true;
+        return false;
+    }
+
+    public void handlePaddleHit(Paddle paddle) {
+        myDirectionY *= -1;
+        myCircle.setCenterY(Main.SIZE_Y - Main.BOUNCER_RADIUS - Main.PADDLE_HEIGHT);
     }
 
     public void reverseXDirection() {
