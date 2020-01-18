@@ -7,8 +7,8 @@ public class Paddle {
     private Rectangle myRectangle;
     private boolean wrapAround = false;
 
-    public Paddle(int centerX, int centerY, int width, int height, Paint fill) {
-        myRectangle = new Rectangle(centerX, centerY, width, height);
+    public Paddle(int X, int Y, int width, int height, Paint fill) {
+        myRectangle = new Rectangle(X, Y, width, height);
         myRectangle.setFill(fill);
     }
 

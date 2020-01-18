@@ -1,5 +1,6 @@
 package breakout;
 
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
@@ -11,17 +12,36 @@ public class Bouncer {
     private int mySpeedY;
 
 
-    public Bouncer(int centerX, int centerY, int radius, Paint fill,  int speedX, int speedY) {
+    public Bouncer(int centerX, int centerY, int radius, Paint fill) {
         myCircle = new Circle(centerX, centerY, radius);
         myCircle.setFill(fill);
         myDirectionX = 1;
         myDirectionY = 1;
+        mySpeedX = 0;
+        mySpeedY = 0;
+    }
+
+    public Bouncer(int centerX, int centerY, int radius, Paint fill, int speedX, int speedY) {
+        this(centerX, centerY, radius, fill);
         mySpeedX = speedX;
         mySpeedY = speedY;
-}
+    }
 
     public Circle getCircle() {
         return myCircle;
+    }
+
+    public double getX() {
+        return myCircle.getCenterX();
+    }
+
+    public double getY() {
+        return myCircle.getCenterY();
+    }
+
+
+    public double getRadius() {
+        return myCircle.getRadius();
     }
 
     public int getXChange() {
@@ -41,18 +61,29 @@ public class Bouncer {
     }
 
     public boolean HitWall() {
-        if (myCircle.getCenterX() + myCircle.getRadius() >= Main.SIZE_X || myCircle.getCenterX() - myCircle.getRadius() <= 0) return false;
-        return true;
+        if (myCircle.getCenterX() + myCircle.getRadius() >= Main.SIZE_X || myCircle.getCenterX() - myCircle.getRadius() <= 0)
+            return true;
+        return false;
     }
 
     public boolean HitCeiling() {
-        if (myCircle.getCenterY() - myCircle.getRadius() <= 0) return false;
-        return true;
+        if (myCircle.getCenterY() - myCircle.getRadius() <= 0) return true;
+        return false;
     }
 
     public boolean HitPaddle(Paddle paddle) {
         if (myCircle.intersects(paddle.getRectangle().getBoundsInLocal())) return true;
         return false;
+    }
+
+    // boolean signifying the ball going off screen
+    public boolean hitBottom(int height) {
+        if (myCircle.getCenterY() > height + myCircle.getRadius()) return true;
+        return false;
+    }
+
+    public void handleBottomHit(int width, int height, int rectHeight) {
+        placeCenter(width, height, rectHeight);
     }
 
     public void handlePaddleHit(Paddle paddle) {
@@ -67,4 +98,64 @@ public class Bouncer {
     public void reverseYDirection() {
         myDirectionY *= -1;
     }
+
+    public void placeCenter(int width, int height, int rectHeight) {
+        myCircle.setCenterX(width / 2);
+        myCircle.setCenterY(height - rectHeight - myCircle.getRadius());
+        myDirectionX = 1;
+        myDirectionY = -1;
+        mySpeedX = 0;
+        mySpeedY = 0;
+    }
+
+
+    public void handleBrick(Brick brick) {
+        if (hitsBrickRight(brick)) handleBrickRight(brick);
+        if (hitsBrickLeft(brick)) handleBrickLeft(brick);
+        if (hitsBrickTop(brick)) handleBrickTop(brick);
+        if (hitsBrickBottom(brick)) handleBrickBottom(brick);
+    }
+
+    // this could be better
+    public boolean hitsBrickRight(Brick brick) {
+        return brick.contains(getX() - getRadius(), getY());
+    }
+
+    public boolean hitsBrickLeft(Brick brick) {
+        return brick.contains(getX() + getRadius(), getY());
+    }
+
+    public boolean hitsBrickTop(Brick brick) {
+        return brick.contains(getX(), getY() + getRadius());
+    }
+
+    public boolean hitsBrickBottom(Brick brick) {
+        return brick.contains(getX(), getY() - getRadius());
+    }
+
+    public void handleBrickRight(Brick brick) {
+        myDirectionX *= -1;
+        setX(brick.getX() + brick.getWidth() + getRadius());
+        brick.handleHit();
+        System.out.println("hit right");
+    }
+
+    public void handleBrickLeft(Brick brick) {
+        myDirectionX *= -1;
+        setX(brick.getX() - getRadius());
+        brick.handleHit();
+    }
+
+    public void handleBrickTop(Brick brick) {
+        myDirectionY *= -1;
+        setY(brick.getY() - getRadius());
+        brick.handleHit();
+    }
+
+    public void handleBrickBottom(Brick brick) {
+        myDirectionY *= -1;
+        setY(brick.getY() + brick.getHeight() + getRadius());
+        brick.handleHit();
+    }
 }
+

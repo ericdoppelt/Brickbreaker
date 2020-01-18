@@ -20,25 +20,34 @@ public class Main extends Application {
     public static final int SIZE_Y = 600;
     public static final String TITLE = "Breakout!";
     public static final Paint BACKGROUND = Color.AZURE;
+
+    public static int LIVES = 3;
+
     public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 100;
-    public static final int PADDLE_HEIGHT = 20;
+    public static final int PADDLE_WIDTH = 200;
+    public static final int PADDLE_HEIGHT = 10;
+    private static final int PADDLE_SPEED = 50;
+
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 100;
-    public static final int BOUNCER_SPEED_Y = -200;
+    public static final int BOUNCER_SPEED_X = 300;
+    public static final int BOUNCER_SPEED_Y = -500;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-    private static final int MOVER_SPEED = 40;
+    public static final int BRICK_LENGTH = 100;
+    public static final int BRICK_HEIGHT = 200;
 
     private Scene myScene;
     private Scene mySplashScreen;
+    private static Group myRoot;
 
     private Bouncer myBouncer;
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
+    private static ArrayList<Brick> allBricks = new ArrayList<>();
+
     private Paddle myPaddle;
 
     /**
@@ -67,26 +76,46 @@ public class Main extends Application {
     private void step(double elapsedTime) {
 
         for (Bouncer tempBouncer : allBouncers) {
-            if (!tempBouncer.HitWall()) tempBouncer.reverseXDirection();
-            if (!tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
-            if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
+
+            // this could be a method?
+            if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
+            else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
+            else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
+            else if (tempBouncer.hitBottom(SIZE_Y)) {
+                LIVES--;
+                tempBouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
+            }
+
+                for (Brick tempBrick : allBricks) {
+                    myBouncer.handleBrick(tempBrick);
+            }
+
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
-
         }
+
+        System.out.println(LIVES);
     }
 
+
     private Scene setupGame(int width, int height, Paint background) {
-        Group root = new Group();
-        myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
-        System.out.println("okay");
+        myRoot = new Group();
+        myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, 600, 200);
         allBouncers.add(myBouncer);
+
         myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
-        root.getChildren().add(myBouncer.getCircle());
-        root.getChildren().add(myPaddle.getRectangle());
+        Brick myBrick = new Brick(width/2, height/2, BRICK_LENGTH, BRICK_HEIGHT, 7);
+        Brick myBrick2 = new Brick(width/4, height/4, BRICK_LENGTH, BRICK_HEIGHT, 7);
 
-        Scene scene = new Scene(root, width, height, background);
+        allBricks.add(myBrick);
+        allBricks.add(myBrick2);
+
+        myRoot.getChildren().add(myBouncer.getCircle());
+        myRoot.getChildren().add(myPaddle.getRectangle());
+        for (Brick tempBrick: allBricks) myRoot.getChildren().add(tempBrick.getRectangle());
+
+        Scene scene = new Scene(myRoot, width, height, background);
 
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         // scene.setOnMouseClicked(e -> handleMouseInput(e.getX(), e.getY()));
@@ -96,17 +125,24 @@ public class Main extends Application {
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + MOVER_SPEED);
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + PADDLE_SPEED);
             if (myPaddle.offRight(SIZE_X)) myPaddle.handleRight(SIZE_X);
         }
         else if (code == KeyCode.LEFT) {
-            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - MOVER_SPEED);
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - PADDLE_SPEED);
             if (myPaddle.offLeft()) myPaddle.handleLeft(SIZE_X);
         }
         else if (code == KeyCode.W) {
             myPaddle.toggleWrapAround();
         } else if (code == KeyCode.R) {
             myPaddle.placeCenter(SIZE_X);
+        } else if (code == KeyCode.L) {
+            LIVES++;
         }
+    }
+
+    public static void deleteBrick(Brick brick) {
+        myRoot.getChildren().remove(brick.getRectangle());
+        allBricks.remove(brick);
     }
 }
