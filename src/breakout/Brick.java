@@ -10,7 +10,7 @@ public class Brick {
     protected Rectangle myRectangle;
     protected int myHitsLeft;
 
-    public Brick(int X, int Y, int rectWidth, int rectHeight, int hits) {
+    public Brick(double X, double Y, double rectWidth, double rectHeight, int hits) {
         myRectangle = new Rectangle(X, Y, rectWidth, rectHeight);
         myHitsLeft = hits;
         colorBrick();

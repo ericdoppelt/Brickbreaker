@@ -3,6 +3,7 @@ package breakout;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -11,8 +12,10 @@ import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.util.Duration;
 
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class Main extends Application {
@@ -30,7 +33,7 @@ public class Main extends Application {
     private static final int PADDLE_SPEED = 50;
 
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 0;
+    public static final int BOUNCER_SPEED_X = 200;
     public static final int BOUNCER_SPEED_Y = -300;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
@@ -112,26 +115,31 @@ public class Main extends Application {
     }
 
     private Scene setupGame(int width, int height, Paint background) {
+
         myRoot = new Group();
         myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
         allBouncers.add(myBouncer);
 
         myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
-        PoweredBrick myBrick = new PoweredBrick(width/2, height/2, BRICK_LENGTH, BRICK_HEIGHT, 7);
-        Brick myBrick2 = new Brick(width/4, height/4, BRICK_LENGTH, BRICK_HEIGHT, 7);
+        LevelReader level1 = new LevelReader(1, SIZE_X, SIZE_Y);
+        ArrayList<Brick> levelBricks = level1.readLevel();
 
-        allBricks.add(myBrick);
-        allBricks.add(myBrick2);
+        for (Brick tempBrick : levelBricks) {
+            allBricks.add(tempBrick);
+            myRoot.getChildren().add(tempBrick.getRectangle());
+        }
 
         myRoot.getChildren().add(myBouncer.getCircle());
         myRoot.getChildren().add(myPaddle.getRectangle());
-        for (Brick tempBrick: allBricks) myRoot.getChildren().add(tempBrick.getRectangle());
+
+        System.out.println(myRoot.getChildren());
 
         Scene scene = new Scene(myRoot, width, height, background);
 
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         // scene.setOnMouseClicked(e -> handleMouseInput(e.getX(), e.getY()));
+        System.out.println(allBouncers.size());
         return scene;
     }
 

@@ -7,10 +7,11 @@ import javafx.scene.shape.Rectangle;
 
 public class PoweredBrick extends Brick {
 
-    private PowerUp myPowerUp = new PowerUp(null);
+    private PowerUp myPowerUp;
 
-    public PoweredBrick(int X, int Y, int rectWidth, int rectHeight, int hits) {
+    public PoweredBrick(int X, int Y, int rectWidth, int rectHeight, int hits, PowerUp power) {
         super(X, Y, rectWidth, rectHeight, hits);
+        myPowerUp = power;
     }
 
     @Override
@@ -19,7 +20,7 @@ public class PoweredBrick extends Brick {
         if (myHitsLeft == 0)  myPowerUp.dropPowerUp(Main.myRoot, this);
     }
 
-    public PowerUp getPowerUp() {
+    public PowerUp getPowerUP() {
         return myPowerUp;
     }
 }
