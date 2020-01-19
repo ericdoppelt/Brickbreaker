@@ -29,8 +29,8 @@ public class Main extends Application {
     private static final int PADDLE_SPEED = 50;
 
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 300;
-    public static final int BOUNCER_SPEED_Y = -500;
+    public static final int BOUNCER_SPEED_X = 500;
+    public static final int BOUNCER_SPEED_Y = -100;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
     public static final int FRAMES_PER_SECOND = 60;
@@ -42,7 +42,7 @@ public class Main extends Application {
 
     private Scene myScene;
     private Scene mySplashScreen;
-    private static Group myRoot;
+    public static Group myRoot;
 
     private Bouncer myBouncer;
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
@@ -81,31 +81,30 @@ public class Main extends Application {
             if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
             else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
             else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
-            else if (tempBouncer.hitBottom(SIZE_Y)) {
-                LIVES--;
-                tempBouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
-            }
+            else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
 
-                for (Brick tempBrick : allBricks) {
-                    myBouncer.handleBrick(tempBrick);
+            for (Brick tempBrick : allBricks) {
+                if (myBouncer.hitsBrick(tempBrick)) myBouncer.handleBrick(tempBrick);
             }
 
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
         }
-
-        System.out.println(LIVES);
     }
 
+    private void handleFallOff(Bouncer bouncer) {
+        LIVES--;
+        bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
+    }
 
     private Scene setupGame(int width, int height, Paint background) {
         myRoot = new Group();
-        myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, 600, 200);
+        myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
         allBouncers.add(myBouncer);
 
         myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
-        Brick myBrick = new Brick(width/2, height/2, BRICK_LENGTH, BRICK_HEIGHT, 7);
+        PoweredBrick myBrick = new PoweredBrick(width/2, height/2, BRICK_LENGTH, BRICK_HEIGHT, 7);
         Brick myBrick2 = new Brick(width/4, height/4, BRICK_LENGTH, BRICK_HEIGHT, 7);
 
         allBricks.add(myBrick);
@@ -144,5 +143,9 @@ public class Main extends Application {
     public static void deleteBrick(Brick brick) {
         myRoot.getChildren().remove(brick.getRectangle());
         allBricks.remove(brick);
+    }
+
+    public static Group getRoot() {
+        return myRoot;
     }
 }

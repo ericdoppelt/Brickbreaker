@@ -3,6 +3,7 @@ package breakout;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Paint;
+import javafx.scene.Group;
 
 public class Brick {
 
@@ -31,6 +32,11 @@ public class Brick {
         else if (myHitsLeft == 7) myRectangle.setFill(Color.VIOLET);
     }
 
+    public void handleHit() {
+        myHitsLeft--;
+        colorBrick();
+    }
+
     public double getX() {
         return myRectangle.getX();
     }
@@ -51,9 +57,11 @@ public class Brick {
         return getRectangle().contains(x, y);
     }
 
-    public void handleHit() {
-        myHitsLeft--;
-        colorBrick();
+    public double getCenterX() {
+        return myRectangle.getX() + (myRectangle.getWidth() / 2);
     }
 
+    public double getBottomY() {
+        return myRectangle.getY() + myRectangle.getHeight();
+    }
 }

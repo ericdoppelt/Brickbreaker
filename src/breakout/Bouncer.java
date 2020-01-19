@@ -109,11 +109,16 @@ public class Bouncer {
     }
 
 
+    public boolean hitsBrick(Brick brick) {
+        return hitsBrickRight(brick) || hitsBrickBottom(brick) || hitsBrickLeft(brick) || hitsBrickTop(brick);
+    }
+
     public void handleBrick(Brick brick) {
         if (hitsBrickRight(brick)) handleBrickRight(brick);
         if (hitsBrickLeft(brick)) handleBrickLeft(brick);
         if (hitsBrickTop(brick)) handleBrickTop(brick);
         if (hitsBrickBottom(brick)) handleBrickBottom(brick);
+        brick.handleHit();
     }
 
     // this could be better
@@ -136,26 +141,21 @@ public class Bouncer {
     public void handleBrickRight(Brick brick) {
         myDirectionX *= -1;
         setX(brick.getX() + brick.getWidth() + getRadius());
-        brick.handleHit();
-        System.out.println("hit right");
     }
 
     public void handleBrickLeft(Brick brick) {
         myDirectionX *= -1;
         setX(brick.getX() - getRadius());
-        brick.handleHit();
     }
 
     public void handleBrickTop(Brick brick) {
         myDirectionY *= -1;
         setY(brick.getY() - getRadius());
-        brick.handleHit();
     }
 
     public void handleBrickBottom(Brick brick) {
         myDirectionY *= -1;
         setY(brick.getY() + brick.getHeight() + getRadius());
-        brick.handleHit();
     }
 }
 
