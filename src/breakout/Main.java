@@ -132,7 +132,7 @@ public class Main extends Application {
     private Scene setupGame(int width, int height, Paint background) {
 
         myLives = LIVES;
-        myLevel = 1;
+        myLevel = 3;
 
         myRoot = new Group();
         myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);

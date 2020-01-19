@@ -13,7 +13,6 @@ public class LevelReader {
     private int mySizeY;
 
     public LevelReader(int level, int sizeX, int sizeY) {
-        if (level > 2) return;
 
         try {
             String fileName = "./resources/level" + level + ".txt";
@@ -23,7 +22,6 @@ public class LevelReader {
             mySizeY = sizeY;
 
         } catch(FileNotFoundException e) {
-            return;
         }
     }
 
@@ -35,8 +33,8 @@ public class LevelReader {
             String[] fileBricks = line.split(" ");
             for (int i = 0; i < fileBricks.length; i++) {
                 String block = fileBricks[i];
-                int hits = readBlockNumber(block);
                 char power = readBlockPower(block);
+                int hits = readBlockNumber(block);
 
                 if (hits > 0) {
                     Brick tempBrick = createBrick(hits, power, row, i);
@@ -68,11 +66,11 @@ public class LevelReader {
     }
 
     private int readBlockNumber(String s) {
-        return Integer.parseInt(s.substring(0, 1));
+        return Integer.parseInt(s.substring(1));
     }
 
     private char readBlockPower(String s) {
-        return s.charAt(1);
+        return s.charAt(0);
     }
 
     private double getUnitLengthX() {
