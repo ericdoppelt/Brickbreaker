@@ -3,7 +3,6 @@ package breakout;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -12,10 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class Main extends Application {
@@ -51,13 +47,15 @@ public class Main extends Application {
 
     private Bouncer myBouncer;
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
-    private static ArrayList<Brick> allBricks = new ArrayList<>();
+    private static ArrayList<Brick> allPlayableBricks = new ArrayList<>();
+    private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
+
     public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // change
 
     private Paddle myPaddle;
 
     private static int myLevel;
-    private static final int myNumberLevels = 4;
+    private static final int myNumberLevels = 3;
 
     /**
      * Start of the program.
@@ -86,7 +84,7 @@ public class Main extends Application {
 
         // if (gameOver()) endGame();
         if (bricksCleared()) {
-            loadNextLevel();
+            loadLevel(++myLevel);
         }
 
         for (Bouncer tempBouncer : allBouncers) {
@@ -97,16 +95,20 @@ public class Main extends Application {
             else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
             else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
 
-            for (int i = 0; i < allBricks.size(); i++) {
-                if (myBouncer.hitsBrick(allBricks.get(i))) {
-                    myBouncer.handleBrick(allBricks.get(i));
-                    allBricks.get(i).handleHit();
-                    if (!allBricks.get(i).hasHitsLeft()) {
-                        myRoot.getChildren().remove(allBricks.get(i).getRectangle());
-                        allBricks.remove(i);
+            for (int i = 0; i < allPlayableBricks.size(); i++) {
+                if (myBouncer.hitsBrick(allPlayableBricks.get(i))) {
+                    myBouncer.handleBrick(allPlayableBricks.get(i));
+                    allPlayableBricks.get(i).handleHit();
+                    if (!allPlayableBricks.get(i).hasHitsLeft()) {
+                        myRoot.getChildren().remove(allPlayableBricks.get(i).getRectangle());
+                        allPlayableBricks.remove(i);
                         i--;
                     }
                 }
+            }
+
+            for (PermanentBrick tempBrick : allPermanentBricks) {
+                if (myBouncer.hitsBrick(tempBrick)) myBouncer.handleBrick(tempBrick);
             }
 
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
@@ -132,7 +134,7 @@ public class Main extends Application {
     private Scene setupGame(int width, int height, Paint background) {
 
         myLives = LIVES;
-        myLevel = 3;
+        myLevel = 1;
 
         myRoot = new Group();
         myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
@@ -144,8 +146,8 @@ public class Main extends Application {
         ArrayList<Brick> levelBricks = level1.readLevel();
 
         for (Brick tempBrick : levelBricks) {
-            allBricks.add(tempBrick);
             myRoot.getChildren().add(tempBrick.getRectangle());
+            if (!(tempBrick instanceof PermanentBrick)) allPlayableBricks.add(tempBrick);
         }
 
         myRoot.getChildren().add(myBouncer.getCircle());
@@ -174,12 +176,22 @@ public class Main extends Application {
             myPaddle.placeCenter(SIZE_X);
         } else if (code == KeyCode.L) {
             myLives++;
+        } else if (code == KeyCode.DIGIT1) {
+            loadLevel(1);
+        } else if (code == KeyCode.DIGIT2) {
+            loadLevel(2);
+        } else if (codeHighestLevel(code)) {
+            loadLevel(myNumberLevels);
         }
+    }
+
+    private boolean codeHighestLevel(KeyCode code) {
+        return code.getCode() - 48 >= myNumberLevels && code.getCode() <= 57;
     }
 
     public static void deleteBrick(Brick brick) {
         myRoot.getChildren().remove(brick.getRectangle());
-        allBricks.remove(brick);
+        allPlayableBricks.remove(brick);
     }
 
     public static Group getRoot() {
@@ -187,7 +199,7 @@ public class Main extends Application {
     }
 
     private boolean bricksCleared() {
-        return allBricks.size() == 0;
+        return allPlayableBricks.size() == 0;
     }
 
     private boolean gameOver() {
@@ -196,14 +208,25 @@ public class Main extends Application {
 
     private void endGame() {};
 
-    private void loadNextLevel() {
-        myLevel++;
-        if (myLevel <= 2) {
+    private void loadLevel(int i) {
+        clearLevel();
+
+        myLevel = i;
+        if (myLevel <= myNumberLevels) {
             LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
+
             for (Brick tempBrick : nextLevel.readLevel()) {
-                allBricks.add(tempBrick);
+                if (tempBrick instanceof PermanentBrick) allPermanentBricks.add((PermanentBrick)tempBrick);
+                else allPlayableBricks.add(tempBrick);
+
                 myRoot.getChildren().add(tempBrick.getRectangle());
             }
         }
     }
+
+    private void clearLevel() {
+        for (Brick tempBrick : allPlayableBricks) myRoot.getChildren().remove(tempBrick.getRectangle());
+        for (Brick tempBrick : allPermanentBricks) myRoot.getChildren().remove(tempBrick.getRectangle());
+    }
 }
+
