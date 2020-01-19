@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.util.Duration;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -29,8 +30,8 @@ public class Main extends Application {
     private static final int PADDLE_SPEED = 50;
 
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 500;
-    public static final int BOUNCER_SPEED_Y = -100;
+    public static final int BOUNCER_SPEED_X = 0;
+    public static final int BOUNCER_SPEED_Y = -300;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
     public static final int FRAMES_PER_SECOND = 60;
@@ -47,6 +48,7 @@ public class Main extends Application {
     private Bouncer myBouncer;
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
     private static ArrayList<Brick> allBricks = new ArrayList<>();
+    public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // change
 
     private Paddle myPaddle;
 
@@ -84,12 +86,24 @@ public class Main extends Application {
             else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
 
             for (Brick tempBrick : allBricks) {
-                if (myBouncer.hitsBrick(tempBrick)) myBouncer.handleBrick(tempBrick);
+                if (myBouncer.hitsBrick(tempBrick)) {
+                    myBouncer.handleBrick(tempBrick);
+                }
             }
 
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
         }
+
+        for (PowerUp tempPowerUp : allPowerUps) {
+            if (tempPowerUp.isCaught(myPaddle)) {
+                tempPowerUp.handleCatch(myRoot);
+                allPowerUps.remove(tempPowerUp);
+            } else {
+                tempPowerUp.setY(tempPowerUp.getY() + tempPowerUp.getDropSpeed() * elapsedTime);
+            }
+        }
+
     }
 
     private void handleFallOff(Bouncer bouncer) {

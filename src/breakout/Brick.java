@@ -7,8 +7,8 @@ import javafx.scene.Group;
 
 public class Brick {
 
-    private Rectangle myRectangle;
-    private int myHitsLeft;
+    protected Rectangle myRectangle;
+    protected int myHitsLeft;
 
     public Brick(int X, int Y, int rectWidth, int rectHeight, int hits) {
         myRectangle = new Rectangle(X, Y, rectWidth, rectHeight);
