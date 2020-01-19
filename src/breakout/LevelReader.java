@@ -54,8 +54,9 @@ public class LevelReader {
         double brickLength = getUnitLengthX();
         double brickWidth = getUnitLengthY();
 
-        if (power == 'B') return new Brick(x, y, brickLength, brickWidth, hits);
-        else return new Brick(x, y, brickLength, brickWidth, 5);
+        if (power == 'B') return new NormalBrick(x, y, brickLength, brickWidth, hits);
+        else if (power == 'P') return new PermanentBrick(x, y, brickLength, brickWidth);
+        else return null;
     }
 
     private double calculateBrickX(int column) {

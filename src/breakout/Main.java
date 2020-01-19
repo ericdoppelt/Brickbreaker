@@ -150,7 +150,7 @@ public class Main extends Application {
 
         myRoot.getChildren().add(myBouncer.getCircle());
         myRoot.getChildren().add(myPaddle.getRectangle());
-        
+
         Scene scene = new Scene(myRoot, width, height, background);
 
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
