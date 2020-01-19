@@ -118,7 +118,6 @@ public class Bouncer {
         if (hitsBrickLeft(brick)) handleBrickLeft(brick);
         if (hitsBrickTop(brick)) handleBrickTop(brick);
         if (hitsBrickBottom(brick)) handleBrickBottom(brick);
-        brick.handleHit();
     }
 
     // this could be better

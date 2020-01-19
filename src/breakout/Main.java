@@ -26,15 +26,16 @@ public class Main extends Application {
     public static final Paint BACKGROUND = Color.AZURE;
 
     public static int LIVES = 3;
+    private static int myLives;
 
     public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 200;
+    public static final int PADDLE_WIDTH = 800;
     public static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_SPEED = 50;
 
     public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 200;
-    public static final int BOUNCER_SPEED_Y = -300;
+    public static final int BOUNCER_SPEED_X = 250;
+    public static final int BOUNCER_SPEED_Y = -500;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
 
     public static final int FRAMES_PER_SECOND = 60;
@@ -54,6 +55,9 @@ public class Main extends Application {
     public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // change
 
     private Paddle myPaddle;
+
+    private static int myLevel;
+    private static final int myNumberLevels = 4;
 
     /**
      * Start of the program.
@@ -80,6 +84,11 @@ public class Main extends Application {
 
     private void step(double elapsedTime) {
 
+        // if (gameOver()) endGame();
+        if (bricksCleared()) {
+            loadNextLevel();
+        }
+
         for (Bouncer tempBouncer : allBouncers) {
 
             // this could be a method?
@@ -88,9 +97,15 @@ public class Main extends Application {
             else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
             else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
 
-            for (Brick tempBrick : allBricks) {
-                if (myBouncer.hitsBrick(tempBrick)) {
-                    myBouncer.handleBrick(tempBrick);
+            for (int i = 0; i < allBricks.size(); i++) {
+                if (myBouncer.hitsBrick(allBricks.get(i))) {
+                    myBouncer.handleBrick(allBricks.get(i));
+                    allBricks.get(i).handleHit();
+                    if (!allBricks.get(i).hasHitsLeft()) {
+                        myRoot.getChildren().remove(allBricks.get(i).getRectangle());
+                        allBricks.remove(i);
+                        i--;
+                    }
                 }
             }
 
@@ -110,11 +125,14 @@ public class Main extends Application {
     }
 
     private void handleFallOff(Bouncer bouncer) {
-        LIVES--;
+        myLives--;
         bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
     }
 
     private Scene setupGame(int width, int height, Paint background) {
+
+        myLives = LIVES;
+        myLevel = 1;
 
         myRoot = new Group();
         myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
@@ -122,7 +140,7 @@ public class Main extends Application {
 
         myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
 
-        LevelReader level1 = new LevelReader(1, SIZE_X, SIZE_Y);
+        LevelReader level1 = new LevelReader(myLevel, SIZE_X, SIZE_Y);
         ArrayList<Brick> levelBricks = level1.readLevel();
 
         for (Brick tempBrick : levelBricks) {
@@ -132,14 +150,11 @@ public class Main extends Application {
 
         myRoot.getChildren().add(myBouncer.getCircle());
         myRoot.getChildren().add(myPaddle.getRectangle());
-
-        System.out.println(myRoot.getChildren());
-
+        
         Scene scene = new Scene(myRoot, width, height, background);
 
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         // scene.setOnMouseClicked(e -> handleMouseInput(e.getX(), e.getY()));
-        System.out.println(allBouncers.size());
         return scene;
     }
 
@@ -158,7 +173,7 @@ public class Main extends Application {
         } else if (code == KeyCode.R) {
             myPaddle.placeCenter(SIZE_X);
         } else if (code == KeyCode.L) {
-            LIVES++;
+            myLives++;
         }
     }
 
@@ -169,5 +184,26 @@ public class Main extends Application {
 
     public static Group getRoot() {
         return myRoot;
+    }
+
+    private boolean bricksCleared() {
+        return allBricks.size() == 0;
+    }
+
+    private boolean gameOver() {
+        return myLives == 0;
+    }
+
+    private void endGame() {};
+
+    private void loadNextLevel() {
+        myLevel++;
+        if (myLevel <= 2) {
+            LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
+            for (Brick tempBrick : nextLevel.readLevel()) {
+                allBricks.add(tempBrick);
+                myRoot.getChildren().add(tempBrick.getRectangle());
+            }
+        }
     }
 }

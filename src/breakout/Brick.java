@@ -21,9 +21,13 @@ public class Brick {
     }
 
     // consider a switch and an exception?
+
+    public boolean hasHitsLeft() {
+        return myHitsLeft  > 0;
+    }
+
     public void colorBrick() {
-        if (myHitsLeft == 0) Main.deleteBrick(this);
-        else if (myHitsLeft == 1) myRectangle.setFill(Color.RED);
+        if (myHitsLeft == 1) myRectangle.setFill(Color.RED);
         else if (myHitsLeft == 2) myRectangle.setFill(Color.ORANGE);
         else if (myHitsLeft == 3) myRectangle.setFill(Color.YELLOW);
         else if (myHitsLeft == 4) myRectangle.setFill(Color.GREEN);
