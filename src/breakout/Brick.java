@@ -89,7 +89,17 @@ public abstract class Brick {
         return myRectangle.getY() + myRectangle.getHeight();
     }
 
+    /**
+     * Abstract method that is implemented in all sublasses of the Brick
+     * This is called when a bouncer collides with the Brick
+     * If applicable, this lowers the number of hits left and can drop a power up if the brick breaks
+     */
     public abstract void handleHit();
 
+    /**
+     * Abstract method that lets the user know if the Brick should be removed or not
+     * Permanent Brick does nothing when this method is called because collisions do not affect them
+     * @return boolean representing whether the Brick has hits left in it
+     */
     public abstract boolean hasHitsLeft();
 }

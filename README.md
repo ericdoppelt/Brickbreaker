@@ -11,7 +11,7 @@ Start Date: January 17th
 
 Finish Date: January 19th 
 
-Hours Spent: 17 (15 coding, 2 reviewing Java)
+Hours Spent: 20 (18 coding, 2 reviewing Java)
 
 ### Resources Used
 
@@ -58,30 +58,33 @@ Cheat keys:
 - 3-9: toggles level 3
 
 Known Bugs:
-- PowerUps do not work/were not implemented, so when the paddle catches a PowerUp, nothing happens.
 - Changing the size of the window can move the game off the screen
 - Changing the level can put the ball "inside" the brick and as such send it to an extreme location on the edge of the new layout.
+- Hitting a corner a certain way can make the ball move seemingly randomly. This is rare though.
+
 Extra credit:
 
 Did not have time to implement the Boss Brick, unfortunately.
 
 ### Notes/Assumptions
 
-- I tried to have different Brick types be subclasses of a general parent type. While
-this made sense logically, since they all represent a similar object, I ran into trouble implementing the 
-.handleBrick() and .hasHitsLeft() methods. I have no experience with abstract classes, and this created a lot of
-trouble for me. There are useless methods that are needed to have the subclass function properly,
-and I do not know how to resolve that at the moment.
+- I decided to have different Brick types be subclasses of a general Brick parent type. Overall, this added
+flexibility to my code. However, one problem that emerged is that the Brick object must have a method .handleHit() which runs
+when the Brick is collided by the Bouncer. For PermanentBricks, though, this method is empty, since nothing
+happens to the Brick when a Bouncer collides with it.
 
-I have a sharp deadline at 11:30 that I must make, so I must stop working on the project
-and submit what I have. Going forward, I would make the root private in the Main, fix the extensions of the
-Brick class, add PowerUps, and add the Start/Win/Lose screens. 
+- When a bouncer collides with a brick, the bouncer is set to be one pixel away from the side of the
+Brick that the collision took place in. This is not noticeable to the human eye, but technically does break the idea
+of continuous movement in brick breaker. I did this to smooth out the gameplay and avoid problems with weird intersections. 
 
 ### Impressions
 
 I thought this was a great assignment to get to learn how to use JavaFX. It incorporated a variety of
 elements of Java coding (such as I/O, Classes/Subclasses, data protection, and "good" classes/methods).
 My only complaint about the project is the time it took, but the responsibility to complete it—regardless
-of the time it takes—is on me solely, and I made a mistake by starting so late. If I could have another day at this, I think
-I would be able to fix it; however, I know that I do not.
+of the time it takes—is on me solely, and I made a mistake by starting so late. Clearly, I am not finished. Many classes
+are missing JavaDoc comments, and I did not implement the Splash Screen, Win Screen, or Lose Screen (although I included empty win and loss functions as a shell).
+
+Going forward, I will certainly start these assignments earlier. If I could have another day at this one, I think
+I would be able to finish the project in time; however, I know that I do not, so I must learn from this mistake.
 
