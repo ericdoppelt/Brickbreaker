@@ -6,7 +6,7 @@ import javafx.scene.shape.Circle;
 /**
  * @author ericdoppelt
  * Purpose is to create a bouncer (which is a ball) that moves around the screen and interacts with Bricks
- * Interacts slightly weird with corners
+ * Occassionally interacts seemingly randomly with corners
  * Interacts with variables used in the Main method, specifically in regards to the following classes: Brick, Paddle
  * Implements the Circle class
  * How to Use it: Initialize a Bouncer and add it to the Main program's root
@@ -109,13 +109,22 @@ public class Bouncer {
         return myCircle.getCenterY();
     }
 
+    /**
+     * Increases the horizontal speed of the bouncer by a given amount
+     * @param increase double to increase horizontal speed by
+     */
     public void addXSpeed(double increase) {
         mySpeedX += increase;
     }
 
+    /**
+     * Increases the vertical speed of the bouncer by a given amount
+     * @param increase double to increase vertical speed by
+     */
     public void addYSpeed(double increase) {
         mySpeedY += increase;
     }
+
     /**
      * gets the radius of the circle
      * @return size of the radius of the circle
@@ -157,8 +166,8 @@ public class Bouncer {
     }
 
     /**
-     * Determines whether a bouncer has collied with a wall
-     * Accesses the size of the frame of game in Main
+     * Determines whether a bouncer has collided with a wall
+     * @param x the size of the frame, used to check if the ball hits the right wall
      * @return boolean telling if a bouncer collides with a wall
      */
     public boolean HitWall(double x) {
@@ -236,7 +245,7 @@ public class Bouncer {
     }
 
     /**
-     * Determines whether a bouncer has collied with a given brick
+     * Determines whether a bouncer has collided with a given brick
      * @param brick Brick to check collision with
      * @return boolean indicating whether the bouncer hit the brick or not
      */
@@ -284,9 +293,9 @@ public class Bouncer {
     }
 
     /**
-     * checks whether the bouncer collided with the given brick from the top
+     * checks whether the bouncer collided with the given brick from the bottom
      * @param brick Brick to check collision for
-     * @return boolean indicating if the bouncer his the brick from the topo
+     * @return boolean indicating if the bouncer his the brick from the bottom
      */
     public boolean hitsBrickBottom(Brick brick) {
         return brick.contains(getX(), getY() - getRadius());
@@ -295,7 +304,7 @@ public class Bouncer {
     /**
      * Called when a bouncer hits a brick from the right
      * Reverses the horizontal direction of the bouncer and sets its location directly to the right of the brick to avoid bugs
-     * @param brick brick that the bouncer collides with
+     * @param brick Brick object that the bouncer collides with
      */
     public void handleBrickRight(Brick brick) {
         myDirectionX *= -1;
@@ -305,7 +314,7 @@ public class Bouncer {
     /**
      * Called when a bouncer hits a brick from the left
      * Reverses the horizontal direction of the bouncer and sets its location directly to the left of the brick to avoid bugs
-     * @param brick brick that the bouncer collides with
+     * @param brick Brick object that the bouncer collides with
      */
     public void handleBrickLeft(Brick brick) {
         myDirectionX *= -1;
@@ -315,7 +324,7 @@ public class Bouncer {
     /**
      * Called when a bouncer hits a brick from the top
      * Reverses the vertical direction of the bouncer and sets its location directly on top of the brick to avoid bugs
-     * @param brick brick that the bouncer collides with
+     * @param brick Brick object that the bouncer collides with
      */
     public void handleBrickTop(Brick brick) {
         myDirectionY *= -1;
@@ -325,7 +334,7 @@ public class Bouncer {
     /**
      * Called when a bouncer hits a brick from the bottom
      * Reverses the vertical direction of the bouncer and sets its location directly to the bottom of the brick to avoid bugs
-     * @param brick brick that the bouncer collides with
+     * @param brick Brick object that the bouncer collides with
      */
     public void handleBrickBottom(Brick brick) {
         myDirectionY *= -1;
