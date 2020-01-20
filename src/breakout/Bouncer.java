@@ -7,6 +7,7 @@ import javafx.scene.shape.Circle;
  * @author ericdoppelt
  * Purpose is to create a bouncer (which is a ball) that moves around the screen and interacts with Bricks
  * Depends on variables used in the Main class and the following classes: Brick, Paddle
+ * Implements the Circle class
  * An example of how to use it is to add a ball to the Main program and allow that to update its position
  */
 public class Bouncer {
