@@ -22,11 +22,14 @@ public class LevelReader {
             mySizeY = sizeY;
 
         } catch(FileNotFoundException e) {
+            System.out.println("File not Found!");
         }
     }
 
     public ArrayList<Brick> readLevel() {
+
         ArrayList<Brick> levelBricks = new ArrayList<Brick>();
+
         int row = 0;
         while (myScanner.hasNextLine()) {
             String line = myScanner.nextLine();
@@ -49,11 +52,12 @@ public class LevelReader {
     private Brick createBrick(int hits, char power, int line, int column) {
         double x = calculateBrickX(column);
         double y = calculateBrickY(line);
-        double brickLength = getUnitLengthX();
-        double brickWidth = getUnitLengthY();
+        double brickWidth = getUnitLengthX();
+        double brickHeight = getUnitLengthY();
 
-        if (power == 'B') return new NormalBrick(x, y, brickLength, brickWidth, hits);
-        else if (power == 'P') return new PermanentBrick(x, y, brickLength, brickWidth);
+        if (power == 'B') return new NormalBrick(x, y, brickWidth, brickHeight, hits);
+        else if (power == 'P') return new PermanentBrick(x, y, brickWidth, brickHeight);
+        else if (power == 'T') return new PoweredBrick(x, y, brickWidth, brickHeight, hits, new PowerUp(new PowerType()));
         else return null;
     }
 

@@ -30,7 +30,7 @@ public class PowerUp {
 
     public void handleCatch(Group root) {
         root.getChildren().remove(myRectangle);
-        myType.addPowerUp();
+        //myType.addPowerUp();
     }
 
     public double getY() {

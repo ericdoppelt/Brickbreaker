@@ -9,7 +9,7 @@ public class PoweredBrick extends NormalBrick {
 
     private PowerUp myPowerUp;
 
-    public PoweredBrick(int X, int Y, int rectWidth, int rectHeight, int hits, PowerUp power) {
+    public PoweredBrick(double X, double Y, double rectWidth, double rectHeight, int hits, PowerUp power) {
         super(X, Y, rectWidth, rectHeight, hits);
         myPowerUp = power;
     }

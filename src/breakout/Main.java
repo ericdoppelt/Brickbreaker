@@ -38,11 +38,8 @@ public class Main extends Application {
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-    public static final int BRICK_LENGTH = 100;
-    public static final int BRICK_HEIGHT = 200;
 
     private Scene myScene;
-    private Scene mySplashScreen;
     public static Group myRoot;
 
     private Bouncer myBouncer;
@@ -115,15 +112,16 @@ public class Main extends Application {
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
         }
 
-        for (PowerUp tempPowerUp : allPowerUps) {
+        for (int i = 0; i < allPowerUps.size(); i++) {
+            PowerUp tempPowerUp = allPowerUps.get(i);
             if (tempPowerUp.isCaught(myPaddle)) {
                 tempPowerUp.handleCatch(myRoot);
                 allPowerUps.remove(tempPowerUp);
+                i--;
             } else {
                 tempPowerUp.setY(tempPowerUp.getY() + tempPowerUp.getDropSpeed() * elapsedTime);
             }
         }
-
     }
 
     private void handleFallOff(Bouncer bouncer) {
@@ -149,6 +147,7 @@ public class Main extends Application {
             myRoot.getChildren().add(tempBrick.getRectangle());
             if (!(tempBrick instanceof PermanentBrick)) allPlayableBricks.add(tempBrick);
         }
+
 
         myRoot.getChildren().add(myBouncer.getCircle());
         myRoot.getChildren().add(myPaddle.getRectangle());
@@ -225,8 +224,23 @@ public class Main extends Application {
     }
 
     private void clearLevel() {
-        for (Brick tempBrick : allPlayableBricks) myRoot.getChildren().remove(tempBrick.getRectangle());
-        for (Brick tempBrick : allPermanentBricks) myRoot.getChildren().remove(tempBrick.getRectangle());
+
+        for (int i = 0; i < allPlayableBricks.size(); i++) {
+            Brick tempBrick = allPlayableBricks.get(i);
+            allPlayableBricks.remove(tempBrick);
+            myRoot.getChildren().remove(tempBrick.getRectangle());
+            i--;
+        }
+        System.out.println(allPlayableBricks.size());
+
+        for (int i = 0; i < allPermanentBricks.size(); i++) {
+            Brick tempBrick = allPermanentBricks.get(i);
+            allPermanentBricks.remove(tempBrick);
+            myRoot.getChildren().remove(tempBrick.getRectangle());
+            i--;
+        }
     }
 }
+
+
 
