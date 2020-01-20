@@ -13,7 +13,15 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 
-
+/**
+ * @author ericdoppelt
+ * Main class runs the game by adding Bouncers, Bricks, and Paddle to the screen and updating their locations.
+ * This is only partially complete, so powerUps do not do anything when caught.
+ * Depends and calls on every class in the breakout package.
+ * Use it by running the main method below.
+ * Note that this is INCOMPLETE. The programmer ran out of time before the deadline, so PowerUps, splashScreen, and Boss Fight are left unmarked.
+ * The root is accessed by a getterMethod to work with PoweredUpBricks, which is problematic.
+ */
 public class Main extends Application {
 
     public static final int SIZE_X = 800;
@@ -25,7 +33,7 @@ public class Main extends Application {
     private int myLives;
 
     public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 80;
+    public static final int PADDLE_WIDTH = 150;
     public static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_SPEED = 50;
 
@@ -39,7 +47,7 @@ public class Main extends Application {
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
     private Scene myScene;
-    public static Group myRoot;
+    private static Group myRoot;
 
     private static ArrayList<Bouncer> allBouncers = new ArrayList<>();
     private static ArrayList<Brick> allPlayableBricks = new ArrayList<>();
@@ -54,13 +62,17 @@ public class Main extends Application {
     private final int myStartLevel = 1;
 
     /**
-     * Start of the program.
+     * Launches the program by calling the start method using JavaFx.
      */
     public static void main(String[] args) {
         launch(args);
     }
 
-    @Override
+    /**
+     * Starts the program by creating the initial Scene and beginning the program's Timeline.
+     * Calls the setupGame() method to construct the initial Scene.
+     * @param stage the Stage for the JavaFX program to run on.
+     */
     public void start(Stage stage) {
         // attach scene to the stage and display it
         myScene = setupGame();
@@ -75,6 +87,12 @@ public class Main extends Application {
         animation.play();
     }
 
+    /**
+     * Returns the root of the program
+     * Used in the PoweredBrick class once to drop a PowerUp
+     * @return the root for the game.
+     */
+    public static Group getRoot() {return myRoot;}
     private Scene setupGame() {
 
         setLives();
@@ -172,7 +190,6 @@ public class Main extends Application {
             }
         }
     }
-
     private void step(double elapsedTime) {
 
         if (bricksCleared()) {
@@ -234,24 +251,9 @@ public class Main extends Application {
         return code.getCode() - 48 >= myNumberLevels && code.getCode() <= 57;
     }
 
-    public static void deleteBrick(Brick brick) {
-        myRoot.getChildren().remove(brick.getRectangle());
-        allPlayableBricks.remove(brick);
-    }
-
-    public static Group getRoot() {
-        return myRoot;
-    }
-
     private boolean bricksCleared() {
         return allPlayableBricks.size() == 0;
     }
-
-    private boolean gameOver() {
-        return myLives == 0;
-    }
-
-    private void endGame() {};
 
     private void loadLevel(int i) {
         clearLevel();
