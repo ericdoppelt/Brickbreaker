@@ -17,7 +17,9 @@ public class PoweredBrick extends NormalBrick {
     @Override
     public void handleHit() {
         super.handleHit();
-        if (myHitsLeft == 0)  myPowerUp.dropPowerUp(this);
+        if (myHitsLeft == 0)  {
+            myPowerUp.dropPowerUp(this);
+        }
     }
 
     public PowerUp getPowerUp() {

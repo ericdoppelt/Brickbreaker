@@ -96,7 +96,7 @@ public class Main extends Application {
 
         myRoot = new Group();
 
-        createStartLevel();
+        loadLevel(myStartLevel);
 
         for (Bouncer tempBouncer : allBouncers) myRoot.getChildren().add(tempBouncer.getCircle());
         myRoot.getChildren().add(myPaddle.getRectangle());
@@ -166,10 +166,10 @@ public class Main extends Application {
             handleBrick(tempBouncer, tempBrick);
 
             if (tempBrick.getPowerUp().wasDropped()) {
+                myRoot.getChildren().add(tempBrick.getPowerUp().getRectangle());
                 allPowerUps.add(tempBrick.getPowerUp());
-                System.out.println("OK");
+
             }
-            System.out.println("oK");
 
             if (tryRemoveBrick(tempBrick)) {
                 allPoweredBricks.remove(i);
@@ -285,7 +285,6 @@ public class Main extends Application {
 
     private void loadLevel(int i) {
         clearLevel();
-
         myLevel = i;
         if (myLevel <= myNumberLevels) {
             LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
