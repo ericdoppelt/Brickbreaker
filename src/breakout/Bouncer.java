@@ -10,6 +10,7 @@ public class Bouncer {
     private int myDirectionY;
     private int mySpeedX;
     private int mySpeedY;
+    private boolean myReset;
 
 
     public Bouncer(int centerX, int centerY, int radius, Paint fill) {
@@ -19,6 +20,23 @@ public class Bouncer {
         myDirectionY = 1;
         mySpeedX = 0;
         mySpeedY = 0;
+        myReset = false;
+    }
+
+    public void setDirectionX(int speedX) {
+        mySpeedX = speedX;
+    }
+
+    public void setDirectionY(int speedY) {
+        mySpeedY = speedY;
+    }
+
+    public boolean getReset() {
+        return myReset;
+    }
+
+    public void setReset(boolean reset) {
+        myReset = reset;
     }
 
     public Bouncer(int centerX, int centerY, int radius, Paint fill, int speedX, int speedY) {

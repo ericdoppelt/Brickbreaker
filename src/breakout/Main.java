@@ -21,11 +21,11 @@ public class Main extends Application {
     public static final String TITLE = "Breakout!";
     public static final Paint BACKGROUND = Color.AZURE;
 
-    public static int LIVES = 3;
+    public static final int LIVES = 3;
     private static int myLives;
 
     public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 800;
+    public static final int PADDLE_WIDTH = 80;
     public static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_SPEED = 50;
 
@@ -38,21 +38,20 @@ public class Main extends Application {
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-
     private Scene myScene;
     public static Group myRoot;
 
-    private Bouncer myBouncer;
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
     private static ArrayList<Brick> allPlayableBricks = new ArrayList<>();
     private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
 
-    public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // change
+    public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
 
     private Paddle myPaddle;
 
     private static int myLevel;
     private static final int myNumberLevels = 3;
+    private final int myStartLevel = 1;
 
     /**
      * Start of the program.
@@ -64,7 +63,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         // attach scene to the stage and display it
-        myScene = setupGame(SIZE_X, SIZE_Y, BACKGROUND);
+        myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
@@ -76,42 +75,92 @@ public class Main extends Application {
         animation.play();
     }
 
+    private Scene setupGame() {
 
-    private void step(double elapsedTime) {
+        setLives();
+        setBouncer();
+        setPaddle();
 
-        // if (gameOver()) endGame();
-        if (bricksCleared()) {
-            loadLevel(++myLevel);
+        myRoot = new Group();
+
+        createStartLevel();
+
+        for (Bouncer tempBouncer : allBouncers) myRoot.getChildren().add(tempBouncer.getCircle());
+        myRoot.getChildren().add(myPaddle.getRectangle());
+
+        Scene scene = new Scene(myRoot, SIZE_X, SIZE_Y, BACKGROUND);
+
+        scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        return scene;
+    }
+
+    private void createStartLevel() {
+        LevelReader startLevel = new LevelReader(myStartLevel, SIZE_X, SIZE_Y);
+        for (Brick tempBrick : startLevel.readLevel()) {
+            myRoot.getChildren().add(tempBrick.getRectangle());
+            if ((tempBrick instanceof PermanentBrick)) allPermanentBricks.add((PermanentBrick)tempBrick); // should be fixed
+            else allPlayableBricks.add(tempBrick);
         }
+    }
 
-        for (Bouncer tempBouncer : allBouncers) {
+    private void setLives() {
+        myLives = LIVES;
+    }
 
-            // this could be a method?
-            if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
-            else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
-            else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
-            else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
+    private void setBouncer() {
+        Bouncer tempBouncer = new Bouncer(SIZE_X / 2, SIZE_Y - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
+        allBouncers.add(tempBouncer);
+    }
 
-            for (int i = 0; i < allPlayableBricks.size(); i++) {
-                if (myBouncer.hitsBrick(allPlayableBricks.get(i))) {
-                    myBouncer.handleBrick(allPlayableBricks.get(i));
-                    allPlayableBricks.get(i).handleHit();
-                    if (!allPlayableBricks.get(i).hasHitsLeft()) {
-                        myRoot.getChildren().remove(allPlayableBricks.get(i).getRectangle());
-                        allPlayableBricks.remove(i);
-                        i--;
-                    }
+    private void setPaddle() {
+        myPaddle = new Paddle((SIZE_X - PADDLE_WIDTH) / 2, SIZE_Y - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
+    }
+
+    private void handleBouncerSurroundings(Bouncer tempBouncer, double elapsedTime) {
+        if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
+        else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
+        else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
+        else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
+    }
+
+    private void handleBouncerPlayables(Bouncer tempBouncer, double elapsedTime) {
+        for (int i = 0; i < allPlayableBricks.size(); i++) {
+            if (tempBouncer.hitsBrick(allPlayableBricks.get(i))) {
+                tempBouncer.handleBrick(allPlayableBricks.get(i));
+                allPlayableBricks.get(i).handleHit();
+                if (!allPlayableBricks.get(i).hasHitsLeft()) {
+                    myRoot.getChildren().remove(allPlayableBricks.get(i).getRectangle());
+                    allPlayableBricks.remove(i);
+                    i--;
                 }
             }
+        }
+    }
 
-            for (PermanentBrick tempBrick : allPermanentBricks) {
-                if (myBouncer.hitsBrick(tempBrick)) myBouncer.handleBrick(tempBrick);
-            }
+    private void handleBouncerPermanents(Bouncer tempBouncer, double elapsedTime) {
+        for (PermanentBrick tempBrick : allPermanentBricks) {
+            if (tempBouncer.hitsBrick(tempBrick)) tempBouncer.handleBrick(tempBrick);
+        }
+    }
 
+    private void updateBouncers(double elapsedTime) {
+        for (Bouncer tempBouncer: allBouncers) {
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
         }
+    }
 
+
+    private void handleBouncers(double elapsedTime) {
+        for (Bouncer tempBouncer : allBouncers) {
+            handleBouncerSurroundings(tempBouncer, elapsedTime);
+            handleBouncerPlayables(tempBouncer, elapsedTime);
+            handleBouncerPermanents(tempBouncer, elapsedTime);
+        }
+    }
+
+
+    private void handlePowerUps(double elapsedTime) {
         for (int i = 0; i < allPowerUps.size(); i++) {
             PowerUp tempPowerUp = allPowerUps.get(i);
             if (tempPowerUp.isCaught(myPaddle)) {
@@ -123,42 +172,22 @@ public class Main extends Application {
             }
         }
     }
+    private void step(double elapsedTime) {
+
+        if (bricksCleared()) {
+            loadLevel(++myLevel);
+        }
+
+        handleBouncers(elapsedTime);
+        handlePowerUps(elapsedTime);
+        updateBouncers(elapsedTime);
+    }
 
     private void handleFallOff(Bouncer bouncer) {
         myLives--;
         bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
+        bouncer.setReset(true);
     }
-
-    private Scene setupGame(int width, int height, Paint background) {
-
-        myLives = LIVES;
-        myLevel = 1;
-
-        myRoot = new Group();
-        myBouncer = new Bouncer(width / 2, height - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
-        allBouncers.add(myBouncer);
-
-        myPaddle = new Paddle((width - PADDLE_WIDTH) / 2, height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
-
-        LevelReader level1 = new LevelReader(myLevel, SIZE_X, SIZE_Y);
-        ArrayList<Brick> levelBricks = level1.readLevel();
-
-        for (Brick tempBrick : levelBricks) {
-            myRoot.getChildren().add(tempBrick.getRectangle());
-            if (!(tempBrick instanceof PermanentBrick)) allPlayableBricks.add(tempBrick);
-        }
-
-
-        myRoot.getChildren().add(myBouncer.getCircle());
-        myRoot.getChildren().add(myPaddle.getRectangle());
-
-        Scene scene = new Scene(myRoot, width, height, background);
-
-        scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        // scene.setOnMouseClicked(e -> handleMouseInput(e.getX(), e.getY()));
-        return scene;
-    }
-
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
@@ -175,7 +204,14 @@ public class Main extends Application {
             myPaddle.placeCenter(SIZE_X);
         } else if (code == KeyCode.L) {
             myLives++;
-        } else if (code == KeyCode.DIGIT1) {
+        } else if (code == KeyCode.SPACE) {
+            for (Bouncer tempBouncer : allBouncers) {
+                if (tempBouncer.getReset()) {
+                    tempBouncer.setDirectionX(BOUNCER_SPEED_X);
+                    tempBouncer.setDirectionY(BOUNCER_SPEED_Y);
+                }
+            }
+        } if (code == KeyCode.DIGIT1) {
             loadLevel(1);
         } else if (code == KeyCode.DIGIT2) {
             loadLevel(2);
