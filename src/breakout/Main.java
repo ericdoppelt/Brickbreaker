@@ -50,7 +50,8 @@ public class Main extends Application {
     private static Group myRoot;
 
     private static ArrayList<Bouncer> allBouncers = new ArrayList<>();
-    private static ArrayList<Brick> allPlayableBricks = new ArrayList<>();
+    private static ArrayList<NormalBrick> allNormalBricks = new ArrayList<>();
+    private static ArrayList<PoweredBrick> allPoweredBricks = new ArrayList<>();
     private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
 
     public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
@@ -116,9 +117,23 @@ public class Main extends Application {
         LevelReader startLevel = new LevelReader(myStartLevel, SIZE_X, SIZE_Y);
         for (Brick tempBrick : startLevel.readLevel()) {
             myRoot.getChildren().add(tempBrick.getRectangle());
-            if ((tempBrick instanceof PermanentBrick)) allPermanentBricks.add((PermanentBrick)tempBrick); // should be fixed
-            else allPlayableBricks.add(tempBrick);
+            if ((tempBrick instanceof NormalBrick)) allNormalBricks.add((NormalBrick)tempBrick);
+            else if ((tempBrick instanceof PoweredBrick)) allPoweredBricks.add((PoweredBrick)tempBrick);
+            else if ((tempBrick instanceof PermanentBrick)) allPermanentBricks.add((PermanentBrick)tempBrick);
         }
+    }
+
+    private void step(double elapsedTime) {
+
+        if (bricksCleared()) {
+            ++myLevel;
+            if (myLevel > myNumberLevels) win();
+            loadLevel(++myLevel);
+        }
+
+        handleBouncersBricks(elapsedTime);
+        handlePowerUps(elapsedTime);
+        updateBouncers(elapsedTime);
     }
 
     private void setLives() {
@@ -134,30 +149,53 @@ public class Main extends Application {
         myPaddle = new Paddle((SIZE_X - PADDLE_WIDTH) / 2, SIZE_Y - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
     }
 
-    private void handleBouncerSurroundings(Bouncer tempBouncer, double elapsedTime) {
+    private void handleBouncerSurroundings(Bouncer tempBouncer) {
         if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
         else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
         else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
         else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
     }
 
-    private void handleBouncerPlayables(Bouncer tempBouncer, double elapsedTime) {
-        for (int i = 0; i < allPlayableBricks.size(); i++) {
-            if (tempBouncer.hitsBrick(allPlayableBricks.get(i))) {
-                tempBouncer.handleBrick(allPlayableBricks.get(i));
-                allPlayableBricks.get(i).handleHit();
-                if (!allPlayableBricks.get(i).hasHitsLeft()) {
-                    myRoot.getChildren().remove(allPlayableBricks.get(i).getRectangle());
-                    allPlayableBricks.remove(i);
-                    i--;
-                }
+    private void handleBouncerNormals(Bouncer tempBouncer) {
+        for (int i = 0; i < allNormalBricks.size(); i++) {
+            NormalBrick tempBrick = allNormalBricks.get(i);
+            handleBrick(tempBouncer, tempBrick);
+            if (tryRemoveBrick(tempBrick)) {
+                allNormalBricks.remove(i);
             }
         }
     }
 
-    private void handleBouncerPermanents(Bouncer tempBouncer, double elapsedTime) {
+    private void handleBouncerPowereds(Bouncer tempBouncer) {
+        for (int i = 0; i < allPoweredBricks.size(); i++) {
+            PoweredBrick tempBrick = allPoweredBricks.get(i);
+            handleBrick(tempBouncer, tempBrick);
+            if (tryRemoveBrick(tempBrick)) {
+                allPoweredBricks.remove(i);
+                i--;
+            }
+        }
+    }
+
+    private void handleBouncerPermanents(Bouncer tempBouncer) {
         for (PermanentBrick tempBrick : allPermanentBricks) {
             if (tempBouncer.hitsBrick(tempBrick)) tempBouncer.handleBrick(tempBrick);
+        }
+    }
+
+    private boolean tryRemoveBrick(Brick tempBrick) {
+        if (!tempBrick.hasHitsLeft()) {
+            myRoot.getChildren().remove(tempBrick.getRectangle());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void handleBrick(Bouncer tempBouncer, Brick tempBrick) {
+        if (tempBouncer.hitsBrick(tempBrick)) {
+            tempBouncer.handleBrick(tempBrick);
+            tempBrick.handleHit();
         }
     }
 
@@ -169,11 +207,12 @@ public class Main extends Application {
     }
 
 
-    private void handleBouncers(double elapsedTime) {
+    private void handleBouncersBricks(double elapsedTime) {
         for (Bouncer tempBouncer : allBouncers) {
-            handleBouncerSurroundings(tempBouncer, elapsedTime);
-            handleBouncerPlayables(tempBouncer, elapsedTime);
-            handleBouncerPermanents(tempBouncer, elapsedTime);
+            handleBouncerSurroundings(tempBouncer);
+            handleBouncerNormals(tempBouncer);
+            handleBouncerPowereds(tempBouncer);
+            handleBouncerPermanents(tempBouncer);
         }
     }
 
@@ -190,21 +229,9 @@ public class Main extends Application {
             }
         }
     }
-    private void step(double elapsedTime) {
-
-        if (bricksCleared()) {
-            ++myLevel;
-            if (myLevel > myNumberLevels) win();
-            loadLevel(++myLevel);
-        }
-
-        handleBouncers(elapsedTime);
-        handlePowerUps(elapsedTime);
-        updateBouncers(elapsedTime);
-    }
 
     private void handleFallOff(Bouncer bouncer) {
-        --myLives;
+        myLives--;
         if (myLives == 0) lose();
         else {
             bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
@@ -252,7 +279,7 @@ public class Main extends Application {
     }
 
     private boolean bricksCleared() {
-        return allPlayableBricks.size() == 0;
+        return allPoweredBricks.size() == 0 && allNormalBricks.size() == 0;
     }
 
     private void loadLevel(int i) {
@@ -263,8 +290,9 @@ public class Main extends Application {
             LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
 
             for (Brick tempBrick : nextLevel.readLevel()) {
+                if (tempBrick instanceof NormalBrick) allNormalBricks.add((NormalBrick)tempBrick);
+                if (tempBrick instanceof PoweredBrick) allPoweredBricks.add((PoweredBrick)tempBrick);
                 if (tempBrick instanceof PermanentBrick) allPermanentBricks.add((PermanentBrick)tempBrick);
-                else allPlayableBricks.add(tempBrick);
 
                 myRoot.getChildren().add(tempBrick.getRectangle());
             }
@@ -272,23 +300,19 @@ public class Main extends Application {
     }
 
     private void clearLevel() {
+        clearBricks(allNormalBricks);
+        clearBricks(allPoweredBricks);
+        clearBricks(allPermanentBricks);
+    }
 
-        for (int i = 0; i < allPlayableBricks.size(); i++) {
-            Brick tempBrick = allPlayableBricks.get(i);
-            allPlayableBricks.remove(tempBrick);
+    private void clearBricks(ArrayList<? extends Brick> listBrick) {
+        for (Brick tempBrick : listBrick)  {
             myRoot.getChildren().remove(tempBrick.getRectangle());
-            i--;
         }
-        System.out.println(allPlayableBricks.size());
-
-        for (int i = 0; i < allPermanentBricks.size(); i++) {
-            Brick tempBrick = allPermanentBricks.get(i);
-            allPermanentBricks.remove(tempBrick);
-            myRoot.getChildren().remove(tempBrick.getRectangle());
-            i--;
-        }
+        listBrick.clear();
     }
 }
+
 
 
 

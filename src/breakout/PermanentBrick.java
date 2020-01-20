@@ -11,4 +11,10 @@ public class PermanentBrick extends Brick {
         myRectangle.setFill(permanantColor);
     }
 
+    public void handleHit() {};
+
+    public boolean hasHitsLeft() {
+        return true;
+    }
+
 }

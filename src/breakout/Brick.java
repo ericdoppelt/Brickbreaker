@@ -89,20 +89,7 @@ public abstract class Brick {
         return myRectangle.getY() + myRectangle.getHeight();
     }
 
-    /**
-     * Supposed to handle a hit on the brick, since this Brick class is never implemented as is, this is problematic
-     * Empty method needed to have sublasses extend the class, otherwise creates bugs
-     * This is a problem and should have been fixed, but I ran out of time.
-     */
-    public void handleHit() {
-    }
+    public abstract void handleHit();
 
-    /**
-     * Supposed to return whether or not a Brick has hits left, since this Brick class is never implemented as is, this is problematic
-     * Fake method needed to have sublasses extend the class, otherwise creates bugs
-     * @return true always
-     */
-    public boolean hasHitsLeft() {
-        return true;
-    }
+    public abstract boolean hasHitsLeft();
 }
