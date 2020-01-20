@@ -1,7 +1,6 @@
 package breakout;
 
-import javafx.scene.Group;
-
+// Ran out of time to implement
 public class PowerType {
     public PowerType() {
         return;

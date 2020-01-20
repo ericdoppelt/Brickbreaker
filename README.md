@@ -45,7 +45,7 @@ In the resources folder:
 Key/Mouse inputs: 
 - Right Arrow: moves paddle right
 - Left Arrow: moves paddle left
-Spacebar: sends ball off if reset at center
+- Spacebar: sends ball off if reset at center
 
 Cheat keys:
 
@@ -68,8 +68,13 @@ Did not have time to implement the Boss Brick, unfortunately.
 
 - I tried to have different Brick types be subclasses of a general parent type. While
 this made sense logically, since they all represent a similar object, I ran into trouble implementing the 
-.handleBrick() method. There are useless methods that are needed to have the subclass function properly,
+.handleBrick() and .hasHitsLeft() methods. I have no experience with abstract classes, and this created a lot of
+trouble for me. There are useless methods that are needed to have the subclass function properly,
 and I do not know how to resolve that at the moment.
+
+I have a sharp deadline at 11:30 that I must make, so I must stop working on the project
+and submit what I have. Going forward, I would make the root private in the Main, fix the extensions of the
+Brick class, add PowerUps, and add the Start/Win/Lose screens. 
 
 ### Impressions
 

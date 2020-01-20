@@ -58,11 +58,5 @@ public class Paddle {
         if (myRectangle.getX() < 0) return true;
         return false;
     }
-
-    public boolean catchPowerUp(PowerUp powerUp) {
-        if (myRectangle.intersects(powerUp.getRectangle().getBoundsInLocal())) return true;
-        return false;
-    }
-
 }
 
