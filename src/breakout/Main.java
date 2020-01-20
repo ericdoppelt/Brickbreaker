@@ -33,14 +33,16 @@ public class Main extends Application {
     private int myLives;
 
     public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 150;
+    public static final int PADDLE_WIDTH = 200;
     public static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_SPEED = 50;
+    private static final int PADDLE_GROWTH = 30;
 
     public static final int BOUNCER_RADIUS = 10;
     public static final int BOUNCER_SPEED_X = 250;
     public static final int BOUNCER_SPEED_Y = -500;
     public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
+    public static final int BOUNCER_SPEED_INCREASE = 200;
 
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
@@ -107,15 +109,6 @@ public class Main extends Application {
         return scene;
     }
 
-    private void createStartLevel() {
-        LevelReader startLevel = new LevelReader(myStartLevel, SIZE_X, SIZE_Y);
-        for (Brick tempBrick : startLevel.readLevel()) {
-            myRoot.getChildren().add(tempBrick.getRectangle());
-            if ((tempBrick instanceof NormalBrick)) allNormalBricks.add((NormalBrick)tempBrick);
-            else if ((tempBrick instanceof PoweredBrick)) allPoweredBricks.add((PoweredBrick)tempBrick);
-            else if ((tempBrick instanceof PermanentBrick)) allPermanentBricks.add((PermanentBrick)tempBrick);
-        }
-    }
 
     private void step(double elapsedTime) {
 
@@ -222,8 +215,9 @@ public class Main extends Application {
         for (int i = 0; i < allPowerUps.size(); i++) {
             PowerUp tempPowerUp = allPowerUps.get(i);
             if (tempPowerUp.isCaught(myPaddle)) {
-                tempPowerUp.handleCatch(myRoot);
+                myRoot.getChildren().remove(tempPowerUp.getRectangle());
                 allPowerUps.remove(tempPowerUp);
+                addPowerUp(tempPowerUp.getType());
                 i--;
             } else {
                 tempPowerUp.setY(tempPowerUp.getY() + tempPowerUp.getDropSpeed() * elapsedTime);
@@ -310,6 +304,31 @@ public class Main extends Application {
             myRoot.getChildren().remove(tempBrick.getRectangle());
         }
         listBrick.clear();
+    }
+
+    private void addPowerUp(String type) {
+        if (type.equals("G")) growPaddle();
+        else if (type.equals("S")) shrinkPaddle();
+        else if (type.equals("I")) speedUpBall();
+    }
+
+    private void growPaddle() {
+        myRoot.getChildren().remove(myPaddle.getRectangle());
+        myPaddle.getRectangle().setWidth(myPaddle.getWidth() + PADDLE_GROWTH);
+        myRoot.getChildren().add(myPaddle.getRectangle());
+    }
+
+    private void shrinkPaddle() {
+        myRoot.getChildren().remove(myPaddle.getRectangle());
+        myPaddle.getRectangle().setWidth(myPaddle.getWidth() - PADDLE_GROWTH);
+        myRoot.getChildren().add(myPaddle.getRectangle());
+    }
+
+    private void speedUpBall() {
+        for (Bouncer tempBouncer : allBouncers) {
+            tempBouncer.addXSpeed(BOUNCER_SPEED_INCREASE);
+            tempBouncer.addYSpeed(BOUNCER_SPEED_INCREASE);
+        }
     }
 }
 

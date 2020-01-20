@@ -25,6 +25,10 @@ public class PowerUp {
         return myDrop;
     }
 
+    public String getType() {
+        return myType;
+    }
+
     public int getDropSpeed() {
         return myDropSpeed;
     }
@@ -33,16 +37,8 @@ public class PowerUp {
         return myRectangle;
     }
 
-    public void handleCatch(Group root) {
-        root.getChildren().remove(myRectangle);
-    }
-
     public double getY() {
         return myRectangle.getY();
-    }
-
-    public void setX(double x) {
-        myRectangle.setX(x);
     }
 
     public void setY(double y) {

@@ -108,6 +108,13 @@ public class Bouncer {
         return myCircle.getCenterY();
     }
 
+    public void addXSpeed(double increase) {
+        mySpeedX += increase;
+    }
+
+    public void addYSpeed(double increase) {
+        mySpeedY += increase;
+    }
     /**
      * gets the radius of the circle
      * @return size of the radius of the circle

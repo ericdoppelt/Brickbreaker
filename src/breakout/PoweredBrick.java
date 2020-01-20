@@ -1,10 +1,5 @@
 package breakout;
 
-import javafx.collections.ObservableList;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.shape.Rectangle;
-
 public class PoweredBrick extends NormalBrick {
 
     private PowerUp myPowerUp;

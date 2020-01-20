@@ -16,6 +16,10 @@ public class Paddle {
         return myRectangle;
     }
 
+    public double getWidth() { return myRectangle.getWidth(); }
+
+    public double getHeight() { return myRectangle.getHeight(); }
+
     public void toggleWrapAround() {
         wrapAround = !wrapAround;
     }
