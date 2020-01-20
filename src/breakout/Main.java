@@ -22,7 +22,7 @@ public class Main extends Application {
     public static final Paint BACKGROUND = Color.AZURE;
 
     public static final int LIVES = 3;
-    private static int myLives;
+    private int myLives;
 
     public static final Paint PADDLE_COLOR = Color.BLACK;
     public static final int PADDLE_WIDTH = 80;
@@ -41,7 +41,7 @@ public class Main extends Application {
     private Scene myScene;
     public static Group myRoot;
 
-    private ArrayList<Bouncer> allBouncers = new ArrayList<>();
+    private static ArrayList<Bouncer> allBouncers = new ArrayList<>();
     private static ArrayList<Brick> allPlayableBricks = new ArrayList<>();
     private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
 
@@ -49,8 +49,8 @@ public class Main extends Application {
 
     private Paddle myPaddle;
 
-    private static int myLevel;
-    private static final int myNumberLevels = 3;
+    private int myLevel;
+    private final int myNumberLevels = 3;
     private final int myStartLevel = 1;
 
     /**
@@ -172,9 +172,12 @@ public class Main extends Application {
             }
         }
     }
+
     private void step(double elapsedTime) {
 
         if (bricksCleared()) {
+            ++myLevel;
+            if (myLevel > myNumberLevels) win();
             loadLevel(++myLevel);
         }
 
@@ -184,10 +187,17 @@ public class Main extends Application {
     }
 
     private void handleFallOff(Bouncer bouncer) {
-        myLives--;
-        bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
-        bouncer.setReset(true);
+        --myLives;
+        if (myLives == 0) lose();
+        else {
+            bouncer.placeCenter(SIZE_X, SIZE_Y, PADDLE_HEIGHT);
+            bouncer.setReset(true);
+        }
     }
+
+    private void win() {}
+
+    private void lose() {}
 
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {

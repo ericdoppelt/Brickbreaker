@@ -1,6 +1,5 @@
 package breakout;
 
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
