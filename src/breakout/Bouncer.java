@@ -6,9 +6,10 @@ import javafx.scene.shape.Circle;
 /**
  * @author ericdoppelt
  * Purpose is to create a bouncer (which is a ball) that moves around the screen and interacts with Bricks
- * Depends on variables used in the Main class and the following classes: Brick, Paddle
+ * Interacts slightly weird with corners
+ * Interacts with variables used in the Main method, specifically in regards to the following classes: Brick, Paddle
  * Implements the Circle class
- * An example of how to use it is to add a ball to the Main program and allow that to update its position
+ * How to Use it: Initialize a Bouncer and add it to the Main program's root
  */
 public class Bouncer {
     private Circle myCircle;
@@ -20,8 +21,8 @@ public class Bouncer {
 
 
     /**
-     * Constructor for the Bouncer class, Ball initializes without moving on the screen
-     * Assume you are creating it on the screen (it does not check if its off screen)
+     * Constructor for the Bouncer class, Ball initializes without any speed
+     * Method assumes you are placing the ball on the screen (it does not check any bounds)
      * @param centerX the X-value for the center of the bouncer
      * @param centerY the Y-value for the center of the bouncer
      * @param radius the radius of the bouncer
@@ -38,7 +39,7 @@ public class Bouncer {
     }
     /**
      * Constructor for the Bouncer class that initializes a moving ball
-     * Assume you are creating it on the screen (it does not check if its off screen)
+     * Assumes you are creating it on the screen (it does not check if its off screen)
      * @param centerX the X-value for the center of the bouncer
      * @param centerY the Y-value for the center of the bouncer
      * @param radius the radius of the bouncer
@@ -54,7 +55,7 @@ public class Bouncer {
 
     /**
      * Updates the instance variable mySpeedX
-     * @param speedX the new horizontal speed to be added each frame
+     * @param speedX the new horizontal speed of the ball
      */
     public void setDirectionX(int speedX) {
         mySpeedX = speedX;
@@ -62,7 +63,7 @@ public class Bouncer {
 
     /**
      * Updates the instance variable mySpeedY
-     * @param speedY the new vertical speed to be added each frame
+     * @param speedY the new vertical speed of the ball
      */
     public void setDirectionY(int speedY) {
         mySpeedY = speedY;
@@ -160,8 +161,8 @@ public class Bouncer {
      * Accesses the size of the frame of game in Main
      * @return boolean telling if a bouncer collides with a wall
      */
-    public boolean HitWall() {
-        if (myCircle.getCenterX() + myCircle.getRadius() >= Main.SIZE_X || myCircle.getCenterX() - myCircle.getRadius() <= 0)
+    public boolean HitWall(double x) {
+        if (myCircle.getCenterX() + myCircle.getRadius() >= x || myCircle.getCenterX() - myCircle.getRadius() <= 0)
             return true;
         return false;
     }
@@ -200,9 +201,9 @@ public class Bouncer {
      * Resetting avoids bugs that occur with the ball getting "stuck" in the paddle and intersecting every frame
      * @param paddle the paddle to place the ball on top of
      */
-    public void handlePaddleHit(Paddle paddle) {
+    public void handlePaddleHit(Paddle paddle, double sizeY, double radius, double height) {
         myDirectionY *= -1;
-        myCircle.setCenterY(Main.SIZE_Y - Main.BOUNCER_RADIUS - Main.PADDLE_HEIGHT);
+        myCircle.setCenterY(sizeY - radius - height);
     }
 
     /**

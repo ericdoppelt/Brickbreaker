@@ -24,29 +24,29 @@ import java.util.ArrayList;
  */
 public class Main extends Application {
 
-    public static final int SIZE_X = 800;
-    public static final int SIZE_Y = 600;
-    public static final String TITLE = "Breakout!";
-    public static final Paint BACKGROUND = Color.AZURE;
+    private static final int SIZE_X = 800;
+    private static final int SIZE_Y = 600;
+    private static final String TITLE = "Breakout!";
+    private static final Paint BACKGROUND = Color.AZURE;
 
-    public static final int LIVES = 3;
+    private static final int LIVES = 3;
     private int myLives;
 
-    public static final Paint PADDLE_COLOR = Color.BLACK;
-    public static final int PADDLE_WIDTH = 200;
-    public static final int PADDLE_HEIGHT = 10;
+    private static final Paint PADDLE_COLOR = Color.BLACK;
+    private static final int PADDLE_WIDTH = 200;
+    private static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_SPEED = 50;
     private static final int PADDLE_GROWTH = 30;
 
-    public static final int BOUNCER_RADIUS = 10;
-    public static final int BOUNCER_SPEED_X = 250;
-    public static final int BOUNCER_SPEED_Y = -500;
-    public static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
-    public static final int BOUNCER_SPEED_INCREASE = 200;
+    private static final int BOUNCER_RADIUS = 10;
+    private static final int BOUNCER_SPEED_X = 250;
+    private static final int BOUNCER_SPEED_Y = -500;
+    private static final Paint BOUNCER_COLOR = Color.ROYALBLUE;
+    private static final int BOUNCER_SPEED_INCREASE = 200;
 
-    public static final int FRAMES_PER_SECOND = 60;
-    public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
-    public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+    private static final int FRAMES_PER_SECOND = 60;
+    private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
+    private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
     private Scene myScene;
     private Group myRoot;
@@ -56,7 +56,7 @@ public class Main extends Application {
     private static ArrayList<PoweredBrick> allPoweredBricks = new ArrayList<>();
     private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
 
-    public static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
+    private static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
 
     private Paddle myPaddle;
 
@@ -137,9 +137,9 @@ public class Main extends Application {
     }
 
     private void handleBouncerSurroundings(Bouncer tempBouncer) {
-        if (tempBouncer.HitWall()) tempBouncer.reverseXDirection();
+        if (tempBouncer.HitWall(SIZE_X)) tempBouncer.reverseXDirection();
         else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
-        else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle);
+        else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle, SIZE_Y, BOUNCER_RADIUS, PADDLE_HEIGHT);
         else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
     }
 
