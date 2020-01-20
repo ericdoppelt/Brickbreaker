@@ -5,19 +5,24 @@ import javafx.scene.Group;
 
 public class PowerUp {
     private Rectangle myRectangle;
-    private PowerType myType;
+    private String myType;
+    private boolean myDrop;
 
     private static final int myDropSpeed = 50;
     private static final int SIZE = 10;
 
-    public PowerUp(PowerType type) {
+    public PowerUp(String type) {
         myType = type;
+        myDrop = false;
     }
 
-    public void dropPowerUp(Group root, Brick brick) {
+    public void dropPowerUp(Brick brick) {
         myRectangle = new Rectangle(brick.getCenterX() - SIZE/2, brick.getBottomY(), SIZE, SIZE);
-        root.getChildren().add(myRectangle);
-        Main.allPowerUps.add(this);
+        myDrop = true;
+    }
+
+    public boolean wasDropped() {
+        return myDrop;
     }
 
     public int getDropSpeed() {
@@ -30,7 +35,6 @@ public class PowerUp {
 
     public void handleCatch(Group root) {
         root.getChildren().remove(myRectangle);
-        //myType.addPowerUp();
     }
 
     public double getY() {

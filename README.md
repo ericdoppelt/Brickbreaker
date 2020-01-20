@@ -60,7 +60,7 @@ Cheat keys:
 Known Bugs:
 - PowerUps do not work/were not implemented, so when the paddle catches a PowerUp, nothing happens.
 - Changing the size of the window can move the game off the screen
-
+- Changing the level can put the ball "inside" the brick and as such send it to an extreme location on the edge of the new layout.
 Extra credit:
 
 Did not have time to implement the Boss Brick, unfortunately.

@@ -47,7 +47,7 @@ public class Main extends Application {
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
     private Scene myScene;
-    private static Group myRoot;
+    private Group myRoot;
 
     private static ArrayList<Bouncer> allBouncers = new ArrayList<>();
     private static ArrayList<NormalBrick> allNormalBricks = new ArrayList<>();
@@ -88,12 +88,6 @@ public class Main extends Application {
         animation.play();
     }
 
-    /**
-     * Returns the root of the program
-     * Used in the PoweredBrick class once to drop a PowerUp
-     * @return the root for the game.
-     */
-    public static Group getRoot() {return myRoot;}
     private Scene setupGame() {
 
         setLives();
@@ -170,6 +164,13 @@ public class Main extends Application {
         for (int i = 0; i < allPoweredBricks.size(); i++) {
             PoweredBrick tempBrick = allPoweredBricks.get(i);
             handleBrick(tempBouncer, tempBrick);
+
+            if (tempBrick.getPowerUp().wasDropped()) {
+                allPowerUps.add(tempBrick.getPowerUp());
+                System.out.println("OK");
+            }
+            System.out.println("oK");
+
             if (tryRemoveBrick(tempBrick)) {
                 allPoweredBricks.remove(i);
                 i--;

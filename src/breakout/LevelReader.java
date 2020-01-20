@@ -57,7 +57,7 @@ public class LevelReader {
 
         if (power == 'B') return new NormalBrick(x, y, brickWidth, brickHeight, hits);
         else if (power == 'P') return new PermanentBrick(x, y, brickWidth, brickHeight);
-        else if (power == 'T') return new PoweredBrick(x, y, brickWidth, brickHeight, hits, new PowerUp(new PowerType()));
+        else if (power == 'T') return new PoweredBrick(x, y, brickWidth, brickHeight, hits, "T");
         else return null;
     }
 

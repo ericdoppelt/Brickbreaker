@@ -222,7 +222,7 @@ public class Bouncer {
         myCircle.setCenterX(width / 2);
         myCircle.setCenterY(height - rectHeight - myCircle.getRadius());
         myDirectionX = 1;
-        myDirectionY = -1;
+        myDirectionY = 1;
         mySpeedX = 0;
         mySpeedY = 0;
     }
