@@ -81,6 +81,6 @@ Brick class, add PowerUps, and add the Start/Win/Lose screens.
 I thought this was a great assignment to get to learn how to use JavaFX. It incorporated a variety of
 elements of Java coding (such as I/O, Classes/Subclasses, data protection, and "good" classes/methods).
 My only complaint about the project is the time it took, but the responsibility to complete it—regardless
-of the time it takes—is on me solely, and I make a mistake. If I could have another day at this, I think
+of the time it takes—is on me solely, and I made a mistake by starting so late. If I could have another day at this, I think
 I would be able to fix it; however, I know that I do not.
 
