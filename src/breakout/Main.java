@@ -24,8 +24,8 @@ import java.util.ArrayList;
  */
 public class Main extends Application {
 
-    private static final int SIZE_X = 800;
-    private static final int SIZE_Y = 600;
+    private static final int SIZE_X = 1000;
+    private static final int SIZE_Y = 800;
     private static final String TITLE = "Breakout!";
     private static final Paint BACKGROUND = Color.AZURE;
 
