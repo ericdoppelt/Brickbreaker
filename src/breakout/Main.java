@@ -132,6 +132,8 @@ public class Main extends Application {
     private void setBouncer() {
         Bouncer tempBouncer = new Bouncer(SIZE_X / 2, SIZE_Y - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
         allBouncers.add(tempBouncer);
+        allBouncers.add(new Bouncer(SIZE_X / 2, 300, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y)); // add a second bouncer!
+
     }
 
     private void setPaddle() {
