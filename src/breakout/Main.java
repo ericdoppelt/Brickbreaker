@@ -51,10 +51,10 @@ public class Main extends Application {
     private Scene myScene;
     private Group myRoot;
 
-    private static ArrayList<Bouncer> allBouncers = new ArrayList<>();
-    private static ArrayList<NormalBrick> allNormalBricks = new ArrayList<>();
-    private static ArrayList<PoweredBrick> allPoweredBricks = new ArrayList<>();
-    private static ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
+    private ArrayList<Bouncer> allBouncers = new ArrayList<>();
+    private ArrayList<NormalBrick> allNormalBricks = new ArrayList<>();
+    private ArrayList<PoweredBrick> allPoweredBricks = new ArrayList<>();
+    private ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
 
     private static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
 
@@ -63,6 +63,7 @@ public class Main extends Application {
     private int myLevel;
     private final int myNumberLevels = 3;
     private final int myStartLevel = 1;
+
 
     /**
      * Launches the program by calling the start method using JavaFx.
@@ -121,6 +122,7 @@ public class Main extends Application {
         handleBouncersBricks(elapsedTime);
         handlePowerUps(elapsedTime);
         updateBouncers(elapsedTime);
+
     }
 
     private void setLives() {
