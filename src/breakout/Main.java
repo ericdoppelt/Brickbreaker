@@ -16,12 +16,11 @@ import java.util.ArrayList;
 /**
  * @author ericdoppelt
  * Main class runs the game by adding Bouncers, Bricks, and Paddle to the screen and updating their locations.
- * This is only partially complete, so powerUps do not do anything when caught.
  * Depends and calls on every class in the breakout package.
  * Use it by running the main method below.
- * Note that this is INCOMPLETE. The programmer ran out of time before the deadline, so PowerUps, splashScreen, and Boss Fight are left unmarked.
- * The root is accessed by a getterMethod to work with PoweredUpBricks, which is problematic.
+ * Note that this is INCOMPLETE. The programmer ran out of time before the deadline, so PowerUps, splashScreen, and Boss Fight are left incomplete.
  */
+
 public class Main extends Application {
 
     private static final int SIZE_X = 1000;
@@ -52,12 +51,8 @@ public class Main extends Application {
     private Group myRoot;
 
     private ArrayList<Bouncer> allBouncers = new ArrayList<>();
-    private ArrayList<NormalBrick> allNormalBricks = new ArrayList<>();
-    private ArrayList<PoweredBrick> allPoweredBricks = new ArrayList<>();
-    private ArrayList<PermanentBrick> allPermanentBricks = new ArrayList<>();
-
-    private static ArrayList<PowerUp> allPowerUps = new ArrayList(); // not used much, ran out of time
-
+    private ArrayList<Brick> allBricks = new ArrayList<>();
+    private static ArrayList<PowerUp> allPowerUps = new ArrayList<>(); // not used much, ran out of time, also why is this italic?
     private Paddle myPaddle;
 
     private int myLevel;
@@ -78,7 +73,6 @@ public class Main extends Application {
      * @param stage the Stage for the JavaFX program to run on.
      */
     public void start(Stage stage) {
-        // attach scene to the stage and display it
         myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
@@ -92,9 +86,9 @@ public class Main extends Application {
     }
 
     private Scene setupGame() {
-
+        // TA Question: thoughts on the white space in this method? does it look too empty?
         setLives();
-        setBouncer();
+        setAllBouncers();
         setPaddle();
 
         myRoot = new Group();
@@ -119,81 +113,115 @@ public class Main extends Application {
             loadLevel(++myLevel);
         }
 
-        handleBouncersBricks(elapsedTime);
+        handleBouncerSurroundings();
+        handleBouncerBricks(); // is there a better way to handle updating bricks and bouncers? maybe do each individually as opposed to together?
         handlePowerUps(elapsedTime);
         updateBouncers(elapsedTime);
-
     }
 
     private void setLives() {
         myLives = LIVES;
     }
 
-    private void setBouncer() {
-        Bouncer tempBouncer = new Bouncer(SIZE_X / 2, SIZE_Y - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y);
-        allBouncers.add(tempBouncer);
-        allBouncers.add(new Bouncer(SIZE_X / 2, 300, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y)); // add a second bouncer!
-
+    private void setAllBouncers() {
+        // is this okay? or would it be better to store the bouncer in a temporary variable and then add it?
+        allBouncers.add(new Bouncer(SIZE_X / 2, SIZE_Y - BOUNCER_RADIUS - PADDLE_HEIGHT, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y));
+        allBouncers.add(new Bouncer(SIZE_X / 2, SIZE_Y / 2, BOUNCER_RADIUS, BOUNCER_COLOR, BOUNCER_SPEED_X, BOUNCER_SPEED_Y));
     }
 
     private void setPaddle() {
         myPaddle = new Paddle((SIZE_X - PADDLE_WIDTH) / 2, SIZE_Y - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_COLOR);
     }
 
-    private void handleBouncerSurroundings(Bouncer tempBouncer) {
-        if (tempBouncer.HitWall(SIZE_X)) tempBouncer.reverseXDirection();
-        else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
-        else if (tempBouncer.HitPaddle(myPaddle)) tempBouncer.handlePaddleHit(myPaddle, SIZE_Y, BOUNCER_RADIUS, PADDLE_HEIGHT);
-        else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
-    }
+    private void loadLevel(int i) {
+        clearLevel();
+        myLevel = i;
+        if (myLevel <= myNumberLevels) {
+            LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
 
-    private void handleBouncerNormals(Bouncer tempBouncer) {
-        for (int i = 0; i < allNormalBricks.size(); i++) {
-            NormalBrick tempBrick = allNormalBricks.get(i);
-            handleBrick(tempBouncer, tempBrick);
-            if (tryRemoveBrick(tempBrick)) {
-                allNormalBricks.remove(i);
+            for (Brick addBrick : nextLevel.readLevel()) {
+                allBricks.add(addBrick);
+                myRoot.getChildren().add(addBrick.getRectangle());
             }
         }
     }
 
-    private void handleBouncerPowereds(Bouncer tempBouncer) {
-        for (int i = 0; i < allPoweredBricks.size(); i++) {
-            PoweredBrick tempBrick = allPoweredBricks.get(i);
-            handleBrick(tempBouncer, tempBrick);
-
-            if (tempBrick.getPowerUp().wasDropped()) {
-                myRoot.getChildren().add(tempBrick.getPowerUp().getRectangle());
-                allPowerUps.add(tempBrick.getPowerUp());
-
+    private void handleKeyInput(KeyCode code) {
+        if (code == KeyCode.RIGHT) {
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + PADDLE_SPEED);
+            if (myPaddle.offRight(SIZE_X)) myPaddle.handleRight(SIZE_X);
+        }
+        else if (code == KeyCode.LEFT) {
+            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - PADDLE_SPEED);
+            if (myPaddle.offLeft()) myPaddle.handleLeft(SIZE_X);
+        }
+        else if (code == KeyCode.W) {
+            myPaddle.toggleWrapAround();
+        } else if (code == KeyCode.R) {
+            myPaddle.placeCenter(SIZE_X);
+        } else if (code == KeyCode.L) {
+            myLives++;
+        } else if (code == KeyCode.SPACE) {
+            for (Bouncer tempBouncer : allBouncers) {
+                if (tempBouncer.getReset()) {
+                    tempBouncer.setDirectionX(BOUNCER_SPEED_X);
+                    tempBouncer.setDirectionY(BOUNCER_SPEED_Y);
+                }
             }
+        } if (code == KeyCode.DIGIT1) {
+            loadLevel(1);
+        } else if (code == KeyCode.DIGIT2) {
+            loadLevel(2);
+        } else if (codeIsHighestLevel(code)) {
+            loadLevel(myNumberLevels);
+        }
+    }
 
-            if (tryRemoveBrick(tempBrick)) {
-                allPoweredBricks.remove(i);
-                i--;
+    private boolean bricksCleared() {
+        for (Brick tempBrick : allBricks) {
+            if (!(tempBrick instanceof PermanentBrick)) return false;
+        }
+        return true;
+    }
+
+    private void handleBouncerSurroundings() {
+        for (Bouncer tempBouncer: allBouncers) {
+            if (tempBouncer.HitWall(SIZE_X)) tempBouncer.reverseXDirection();
+            else if (tempBouncer.HitCeiling()) tempBouncer.reverseYDirection();
+            else if (tempBouncer.HitPaddle(myPaddle))
+                tempBouncer.handlePaddleHit(myPaddle, SIZE_Y, BOUNCER_RADIUS, PADDLE_HEIGHT);
+            else if (tempBouncer.hitBottom(SIZE_Y)) handleFallOff(tempBouncer);
+        }
+    }
+
+    private void handleBouncerBricks() {
+        for (Bouncer tempBouncer : allBouncers) {
+            for (int i = 0; i < allBricks.size(); i++) {
+                Brick testBrick = allBricks.get(i);
+
+                if (tempBouncer.hitsBrick(testBrick)) {
+                    tempBouncer.handleBrick(testBrick);
+                    testBrick.handleHit();
+                }
+
+                // Question for TA: a PoweredBrick returns true here also right? ... it has to?
+                // Other Question: how can I shift the code below into each Brick class?
+                if (testBrick instanceof NormalBrick) {
+                    if (!testBrick.hasHitsLeft()) {
+                        myRoot.getChildren().remove(testBrick.getRectangle());
+                        allBricks.remove(i);
+                    }
+                }
+
+                // TA Comment: feel like there is a better way to do this but cannot think one...
+                if (testBrick instanceof PoweredBrick) {
+                    PoweredBrick testPoweredBrick = (PoweredBrick) testBrick;
+                    if (testPoweredBrick.getPowerUp().wasDropped()) {
+                        myRoot.getChildren().add(testPoweredBrick.getPowerUp().getRectangle());
+                        allPowerUps.add(testPoweredBrick.getPowerUp());
+                    }
+                }
             }
-        }
-    }
-
-    private void handleBouncerPermanents(Bouncer tempBouncer) {
-        for (PermanentBrick tempBrick : allPermanentBricks) {
-            if (tempBouncer.hitsBrick(tempBrick)) tempBouncer.handleBrick(tempBrick);
-        }
-    }
-
-    private boolean tryRemoveBrick(Brick tempBrick) {
-        if (!tempBrick.hasHitsLeft()) {
-            myRoot.getChildren().remove(tempBrick.getRectangle());
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void handleBrick(Bouncer tempBouncer, Brick tempBrick) {
-        if (tempBouncer.hitsBrick(tempBrick)) {
-            tempBouncer.handleBrick(tempBrick);
-            tempBrick.handleHit();
         }
     }
 
@@ -201,16 +229,6 @@ public class Main extends Application {
         for (Bouncer tempBouncer: allBouncers) {
             tempBouncer.setX(tempBouncer.getCircle().getCenterX() + tempBouncer.getXChange() * elapsedTime);
             tempBouncer.setY(tempBouncer.getCircle().getCenterY() + tempBouncer.getYChange() * elapsedTime);
-        }
-    }
-
-
-    private void handleBouncersBricks(double elapsedTime) {
-        for (Bouncer tempBouncer : allBouncers) {
-            handleBouncerSurroundings(tempBouncer);
-            handleBouncerNormals(tempBouncer);
-            handleBouncerPowereds(tempBouncer);
-            handleBouncerPermanents(tempBouncer);
         }
     }
 
@@ -242,72 +260,15 @@ public class Main extends Application {
 
     private void lose() {}
 
-    private void handleKeyInput(KeyCode code) {
-        if (code == KeyCode.RIGHT) {
-            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() + PADDLE_SPEED);
-            if (myPaddle.offRight(SIZE_X)) myPaddle.handleRight(SIZE_X);
-        }
-        else if (code == KeyCode.LEFT) {
-            myPaddle.getRectangle().setX(myPaddle.getRectangle().getX() - PADDLE_SPEED);
-            if (myPaddle.offLeft()) myPaddle.handleLeft(SIZE_X);
-        }
-        else if (code == KeyCode.W) {
-            myPaddle.toggleWrapAround();
-        } else if (code == KeyCode.R) {
-            myPaddle.placeCenter(SIZE_X);
-        } else if (code == KeyCode.L) {
-            myLives++;
-        } else if (code == KeyCode.SPACE) {
-            for (Bouncer tempBouncer : allBouncers) {
-                if (tempBouncer.getReset()) {
-                    tempBouncer.setDirectionX(BOUNCER_SPEED_X);
-                    tempBouncer.setDirectionY(BOUNCER_SPEED_Y);
-                }
-            }
-        } if (code == KeyCode.DIGIT1) {
-            loadLevel(1);
-        } else if (code == KeyCode.DIGIT2) {
-            loadLevel(2);
-        } else if (codeHighestLevel(code)) {
-            loadLevel(myNumberLevels);
-        }
-    }
-
-    private boolean codeHighestLevel(KeyCode code) {
+    private boolean codeIsHighestLevel(KeyCode code) {
         return code.getCode() - 48 >= myNumberLevels && code.getCode() <= 57;
     }
 
-    private boolean bricksCleared() {
-        return allPoweredBricks.size() == 0 && allNormalBricks.size() == 0;
-    }
-
-    private void loadLevel(int i) {
-        clearLevel();
-        myLevel = i;
-        if (myLevel <= myNumberLevels) {
-            LevelReader nextLevel = new LevelReader(myLevel, SIZE_X, SIZE_Y);
-
-            for (Brick tempBrick : nextLevel.readLevel()) {
-                if (tempBrick instanceof NormalBrick) allNormalBricks.add((NormalBrick)tempBrick);
-                if (tempBrick instanceof PoweredBrick) allPoweredBricks.add((PoweredBrick)tempBrick);
-                if (tempBrick instanceof PermanentBrick) allPermanentBricks.add((PermanentBrick)tempBrick);
-
-                myRoot.getChildren().add(tempBrick.getRectangle());
-            }
-        }
-    }
-
     private void clearLevel() {
-        clearBricks(allNormalBricks);
-        clearBricks(allPoweredBricks);
-        clearBricks(allPermanentBricks);
-    }
-
-    private void clearBricks(ArrayList<? extends Brick> listBrick) {
-        for (Brick tempBrick : listBrick)  {
-            myRoot.getChildren().remove(tempBrick.getRectangle());
+        for (Brick removeBrick : allBricks)  {
+            myRoot.getChildren().remove(removeBrick.getRectangle());
         }
-        listBrick.clear();
+        allBricks.clear();
     }
 
     private void addPowerUp(String type) {
@@ -335,7 +296,3 @@ public class Main extends Application {
         }
     }
 }
-
-
-
-
